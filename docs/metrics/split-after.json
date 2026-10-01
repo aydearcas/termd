@@ -1,0 +1,96 @@
+{
+  "bytes": 32264,
+  "blocks": 280,
+  "median_ms": {
+    "activateSplit": 118,
+    "codeEdit": 102,
+    "visualEdit": 99
+  },
+  "samples": {
+    "modes": [
+      181.5,
+      117.80000000074506,
+      111.59999999962747
+    ],
+    "code": [
+      186.19999999925494,
+      127.5,
+      115.40000000037253,
+      89.20000000111759,
+      86.5,
+      73.80000000074506
+    ],
+    "visual": [
+      102.80000000074506,
+      90.40000000037253,
+      100.40000000037253,
+      98.79999999888241,
+      98.59999999962747,
+      80.19999999925494
+    ]
+  },
+  "topFunctions": [
+    [
+      "(idle)",
+      515
+    ],
+    [
+      "subtokenize",
+      319
+    ],
+    [
+      "exports.jsxDEV",
+      195
+    ],
+    [
+      "(program)",
+      194
+    ],
+    [
+      "go",
+      91
+    ],
+    [
+      "exports.createElement",
+      68
+    ],
+    [
+      "(anonymous)",
+      64
+    ],
+    [
+      "consume",
+      44
+    ],
+    [
+      "(garbage collector)",
+      43
+    ],
+    [
+      "eq",
+      38
+    ],
+    [
+      "recursivelyTraverseMutationEffects",
+      26
+    ],
+    [
+      "start",
+      26
+    ],
+    [
+      "compile",
+      22
+    ],
+    [
+      "exit",
+      21
+    ],
+    [
+      "ReactElement",
+      18
+    ]
+  ],
+  "errors": [],
+  "version": "1.2.0"
+}

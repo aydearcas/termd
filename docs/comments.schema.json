@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Termd comments v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "documentId",
+    "documentName",
+    "sourceHash",
+    "savedAt",
+    "comments"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "documentId": {
+      "type": "string"
+    },
+    "documentName": {
+      "type": "string"
+    },
+    "sourceHash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "savedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "comments": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "body",
+          "authorLabel",
+          "createdAt",
+          "updatedAt",
+          "status",
+          "anchor",
+          "replies"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 100000
+          },
+          "authorLabel": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "anchor": {
+            "type": "object",
+            "required": [
+              "from",
+              "to",
+              "quote",
+              "prefix",
+              "suffix",
+              "state"
+            ],
+            "properties": {
+              "kind": {
+                "const": "range"
+              },
+              "offsetUnit": {
+                "const": "utf16"
+              },
+              "from": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "to": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "quote": {
+                "type": "string"
+              },
+              "originalQuote": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              },
+              "suffix": {
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "attached",
+                  "orphan",
+                  "review"
+                ]
+              }
+            }
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "body",
+                "authorLabel",
+                "createdAt"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string",
+                  "maxLength": 100000
+                },
+                "authorLabel": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

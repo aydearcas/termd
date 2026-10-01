@@ -1,0 +1,31 @@
+const { chromium } = require('playwright-core'), packed = require('@sparticuz/chromium').default;
+const assert = require('node:assert/strict'), path = require('node:path'), { spawn } = require('node:child_process');
+(async () => {
+ const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5185'], { stdio: 'ignore' }); let browser;
+ try {
+  for (let i = 0; i < 50; i++) { try { await fetch('http://127.0.0.1:5185/'); break; } catch { await new Promise(r => setTimeout(r, 100)); } }
+  browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || path.resolve('../qa-browser/chromium') });
+  const context = await browser.newContext({ viewport: { width: 1500, height: 1000 } }), page = await context.newPage(), errors = [];
+  page.on('pageerror', e => errors.push(e.message)); await page.addInitScript(() => { if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({ recovery: false })); });
+  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.goto('http://127.0.0.1:5185/');
+  const app = () => page.locator('.app[data-active-document="true"]:visible'), panel = () => app().locator('.outline-panel'), handle = () => app().getByRole('separator', { name: 'Ancho del índice', exact: true });
+  await handle().waitFor();
+  const width = async () => (await panel().boundingBox()).width;
+  const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1, `${actual} != ${expected}`);
+  const waitFor = async fn => { let last; for (let i = 0; i < 40; i++) { try { return await fn(); } catch (e) { last = e; await page.waitForTimeout(30); } } throw last; };
+  const drag = async delta => { const r = await handle().boundingBox(), x = r.x + r.width / 2, y = r.y + r.height / 2; await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x + delta, y, { steps: 8 }); await page.mouse.up(); };
+  let passed = 0; const ok = name => { passed++; console.log('PASS ' + name); };
+  const minimum = await width(); close(minimum, 218); assert.equal(await handle().getAttribute('aria-valuemin'), '218'); ok('Initial outline keeps its original 218px width as the minimum');
+  await drag(80); await waitFor(async () => close(await width(), minimum + 80)); assert.ok(await app().locator('.canvas').isVisible()); ok('Dragging the right edge expands the outline and reflows the workspace');
+  await drag(400); await waitFor(async () => close(await width(), minimum * 1.8)); ok('Dragging beyond the upper bound stops at 180%');
+  await drag(-600); await waitFor(async () => close(await width(), minimum)); ok('Dragging beyond the lower bound retains the original minimum');
+  await handle().focus(); await handle().press('End'); await waitFor(async () => close(await width(), minimum * 1.8)); await handle().press('Home'); await handle().press('ArrowRight'); await waitFor(async () => close(await width(), minimum * 1.05)); await handle().press('ArrowLeft'); await waitFor(async () => close(await width(), minimum)); ok('Keyboard arrows, Home and End resize within the same limits');
+  const box = await handle().boundingBox(), before = await width(), stored = await page.evaluate(() => JSON.parse(localStorage.getItem('wordmd.settings')).outlineScale); await page.mouse.move(box.x + 4, box.y + box.height / 2); await page.mouse.down(); await page.mouse.move(box.x + 110, box.y + box.height / 2); assert.ok(await width() > before); await page.keyboard.press('Escape'); await page.mouse.up(); close(await width(), before); assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('wordmd.settings')).outlineScale), stored); ok('Escape cancels a drag without saving a partial width');
+  await drag(70); const saved = await width(); await page.getByRole('button', { name: 'Nuevo documento', exact: true }).click(); await page.getByRole('menuitem',{name:'Markdown (.md)',exact:true}).click(); await app().locator('.ProseMirror').waitFor(); await waitFor(async () => close(await width(), saved)); await page.getByRole('tab', { name: 'Bienvenida.md', exact: true }).click(); await waitFor(async () => close(await width(), saved)); await page.reload(); await handle().waitFor(); await waitFor(async () => close(await width(), saved)); ok('Outline width is shared across document tabs and retained after reopening');
+  await app().locator('.status-modes').getByRole('button', { name: 'Dividido', exact: true }).click(); await app().locator('.cm-content').waitFor(); await drag(40); assert.equal(await app().locator('.canvas').evaluate(el => el.scrollTop), 0); assert.ok(await app().locator('.ProseMirror').isVisible()); ok('Resizing works in editable split while preserving the fixed workspace');
+  await page.setViewportSize({ width: 1200, height: 900 }); await handle().press('Home'); await waitFor(async () => close(await width(), 175)); await handle().press('End'); await waitFor(async () => close(await width(), 175 * 1.8)); await waitFor(async () => assert.equal(await handle().getAttribute('aria-valuemin'), '175')); ok('The compact layout retains its original 175px minimum and 180% maximum');
+  await page.setViewportSize({ width: 900, height: 800 }); assert.equal(await panel().isVisible(), false); await page.setViewportSize({ width: 1500, height: 1000 }); await handle().waitFor(); await waitFor(async () => close(await width(), 218 * 1.8)); ok('Responsive visibility stays unchanged and the resized width returns on larger screens');
+  await app().locator('.outline-entry').nth(1).click(); assert.ok(await app().locator('.cm-content').evaluate(el => el.contains(document.activeElement))); ok('Outline navigation remains usable after resizing');
+  await page.screenshot({ path: '../outputs/termd-outline-resize.png' }); assert.deepEqual(errors, []); ok('No uncaught browser exceptions'); console.log(JSON.stringify({ passed, errors }, null, 2));
+ } finally { if (browser) await browser.close(); server.kill(); }
+})().catch(e => { console.error(e); process.exit(1); });
