@@ -6,7 +6,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
   for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:5181/');break}catch{await new Promise(r=>setTimeout(r,120))}}
   browser=await chromium.launch({headless:true,args:packed.args,executablePath:process.env.WORDMD_BROWSER||path.resolve('../qa-browser/chromium')});
   const context=await browser.newContext({viewport:{width:1440,height:980}}),page=await context.newPage(),errors=[];
-  page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.goto('http://127.0.0.1:5181/');await page.locator('.ProseMirror').waitFor();
+  page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(() => { window.showSaveFilePicker = undefined; if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({lang: 'es'})); });await page.goto('http://127.0.0.1:5181/');await page.locator('.ProseMirror').waitFor();
   const records=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const req=indexedDB.open('wordmd',1);req.onupgradeneeded=()=>req.result.createObjectStore('drafts',{keyPath:'id'});req.onerror=()=>reject(req.error);req.onsuccess=()=>{const db=req.result,tx=db.transaction('drafts','readonly'),r=tx.objectStore('drafts').getAll();r.onsuccess=()=>resolve(r.result);tx.oncomplete=()=>db.close()}}));
   const empty=async()=>{await page.getByRole('heading',{name:'No hay ningún documento activo',exact:true}).waitFor();assert.equal(await page.getByRole('tab').count(),0);assert.equal(await page.locator('.ProseMirror,.cm-content').count(),0)};
   let passed=0;const ok=n=>{passed++;console.log('PASS '+n)};

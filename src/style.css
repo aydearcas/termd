@@ -34,3 +34,9 @@
 .new-document-options button:hover, .new-document-options button:focus-visible { background: #edf3ff; outline: none; }
 .new-document-options svg { color: #2457c5; flex-shrink: 0; }
 .empty-create-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* Keep the new-document action next to the final tab, within the scrollable strip. */
+.document-tab-strip{display:flex;align-items:center;gap:4px;min-width:0;flex:1;overflow-x:auto;scrollbar-width:thin;height:100%}.document-tab-strip .document-tabs{flex:0 0 auto;overflow:visible}.document-tab-strip .compact-menu{flex-shrink:0}
+/* The welcome document uses a Markdown rule as a visual and printed page break. */
+.welcome-document .document-surface hr{height:32px;margin:48px 0;border:0;background:#f4f6f8;box-shadow:-200px 0 0 #f4f6f8,200px 0 0 #f4f6f8}
+@media print{.welcome-document .document-surface hr{height:0;margin:0;border:0;background:none;box-shadow:none;break-after:page;page-break-after:always}}

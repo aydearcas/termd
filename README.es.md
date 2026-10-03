@@ -2,9 +2,11 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.3.0.
+Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.3.1.
 
 ## Funciones
+
+- Inglés por defecto y bienvenida bilingüe: inglés primero y español después.
 
 - Edición visual y de código; vista dividida con ambas vistas editables y sincronizadas.
 - Varios documentos en pestañas, índice redimensionable y herramientas de tablas.
@@ -57,3 +59,5 @@ Es software de código disponible con restricciones comerciales, no open source 
 ## Apoyar Termd
 
 Termd se puede usar gratis. Si te resulta útil, puedes [apoyar su desarrollo por PayPal](https://paypal.me/aydearcas). Las aportaciones son voluntarias y no desbloquean funciones adicionales. El enlace **Apoyar Termd** está en la barra superior y abre PayPal en una pestaña nueva. Consulta [APOYAR_TERMD.md](APOYAR_TERMD.md) para las instrucciones de publicación.
+
+Para actualizar un repositorio ya publicado, consulta [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md).

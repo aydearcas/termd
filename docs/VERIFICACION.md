@@ -120,3 +120,19 @@ Los ocho scripts abren servidores locales temporales y los detienen al finalizar
 - No se realizan solicitudes externas antes de pulsar el enlace.
 - El botón permanece disponible al cerrar el último documento, cambia de idioma desde Configuración y se muestra como un corazón accesible en una pantalla de 390 px, sin desbordamiento horizontal.
 - El HTML independiente regenerado contiene el mismo enlace.
+
+## Actualización 1.3.1 — 2 de octubre de 2026
+
+Verificación de esta actualización: compilación de producción y HTML independiente regenerados; 16 pruebas del núcleo, 19 pruebas de documentos y 11 pruebas del espacio vacío superadas. Las pruebas existentes que verifican la interfaz española inicializan expresamente esa preferencia.
+
+Comprobaciones adicionales de la web compilada en `/termd/` y del HTML local:
+
+- Inicio limpio en inglés y pestaña `Welcome.md`; se conserva una preferencia explícita de español.
+- Bienvenida en inglés seguida de español, sin el pie inferior del índice.
+- PDF A4 de exactamente dos páginas: primera en inglés y segunda en español.
+- Botón **+** adyacente a la última pestaña; creación de 12 documentos y acceso al botón con desbordamiento horizontal de pestañas.
+- Navegación por teclado entre pestañas. Creación de un `.trmd` en una ventana de 390 px sin desbordamiento general.
+- HTML independiente abierto desde `file://`, con el idioma inicial, bienvenida y enlace de PayPal correctos.
+- Sin excepciones del navegador durante estas comprobaciones.
+
+El informe de la versión anterior permanece arriba como registro histórico.
