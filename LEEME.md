@@ -1,6 +1,6 @@
-# Termd 1.3.0
+# Termd 1.3.1
 
-## Novedades de Termd 1.3.0
+## Novedades de Termd 1.3.1
 
 - Creación explícita de Markdown (.md) o Markdown comentado (.trmd), desde Archivo → Nuevo, + y la pantalla vacía.
 - Guardar y Guardar como mantienen el formato. Guardar como .trmd convierte el documento activo; Guardar .md desde .trmd crea una copia sin comentarios.
@@ -12,7 +12,7 @@
 
 Editor local de Markdown con interfaz de procesador de texto. Incluye edición visual, código, vista dividida y lectura, herramientas de formato, tablas GFM, comentarios a la derecha y configuración en español e inglés.
 
-## Mejoras en Termd 1.3.0
+## Mejoras en Termd 1.3.1
 
 Las herramientas de tabla están en la pestaña contextual **Tabla**, situada después de **Vista**. Aparece al colocar el cursor en una tabla visual, conservando la pestaña abierta; selecciona **Tabla** para ver las herramientas: contiene añadir/eliminar filas y columnas, eliminar la tabla, alineación y salir de la tabla. Puedes elegir otras pestañas mientras editas. Al salir de la tabla se oculta la pestaña contextual y se recupera la última pestaña normal. Las herramientas ocupan la cinta habitual, sin una fila adicional ni reducir el espacio del documento. Se ha eliminado la nota inferior sobre Markdown, tamaño y fuente en Visual, Lectura y Dividido; en Dividido el editor aprovecha el espacio liberado.
 
@@ -152,3 +152,7 @@ Change the interface to English in **Settings → Interface language**. Open a M
 ## Licencia y apoyo al proyecto
 
 Consulta `LICENSE` y `docs/LICENCIA.md` para las condiciones de uso gratuito y redistribución con código. La venta o monetización de Termd por terceros requiere autorización escrita. La barra superior incluye **Apoyar Termd**, un enlace de aportaciones voluntarias que abre https://paypal.me/aydearcas en una pestaña nueva. En pantallas estrechas aparece como un corazón con la misma etiqueta accesible. Consulta `APOYAR_TERMD.md` para publicarlo.
+
+## Cambios de Termd 1.3.1
+
+El idioma inicial es inglés; el idioma guardado en Configuración se conserva. La bienvenida presenta primero inglés y después español, con separación visible y salto de página al imprimir. El botón **+** está junto a la última pestaña. Se ha retirado la frase inferior del índice. Para actualizar GitHub Pages desde el navegador, consulta `ACTUALIZAR_GITHUB.md`.

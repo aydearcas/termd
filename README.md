@@ -2,9 +2,11 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.3.0.
+A Markdown editor with visual editing, a code view, and document comments. Version 1.3.1.
 
 ## Features
+
+- English by default, with a welcome document in English followed by Spanish.
 
 - Visual and Markdown code editors, with a split view that supports editing in both panes and keeps content synchronized.
 - Multiple documents in tabs, a resizable document outline, and contextual table tools.
@@ -62,3 +64,5 @@ This is source-available software with commercial restrictions, rather than OSI-
 ## Support Termd
 
 Termd is free to use. If you find it useful, you can [support its development through PayPal](https://paypal.me/aydearcas). Contributions are voluntary and do not unlock additional features. The **Support Termd** link is available in the app's top bar and opens PayPal in a new tab. See [APOYAR_TERMD.md](APOYAR_TERMD.md) for publishing instructions in Spanish.
+
+For updates to an existing repository, see [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md), the Spanish update guide.

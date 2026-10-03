@@ -12,7 +12,7 @@ export type DocumentFormat = 'md' | 'trmd';
 export interface DocState { documentId: string; fileName: string; format?: DocumentFormat; source: string; comments: Comment[]; bom: boolean; }
 export interface Block { id: string; start: number; end: number; raw: string; gap: string; ast: any; protected: boolean; initialJSON?: string; }
 export interface Settings { lang: 'es' | 'en'; author: string; fontSize: number; lineHeight: number; width: number; serif: boolean; bubble: boolean; remoteImages: boolean; recovery: boolean; lineNumbers: boolean; wrap: boolean; initialMode: Mode; splitMode: 'preview' | 'editable'; outlineScale: number; }
-export const defaultSettings: Settings = { lang: 'es', author: '', fontSize: 17, lineHeight: 1.65, width: 810, serif: false, bubble: true, remoteImages: false, recovery: true, lineNumbers: true, wrap: true, initialMode: 'visual', splitMode: 'editable', outlineScale: 1 };
+export const defaultSettings: Settings = { lang: 'en', author: '', fontSize: 17, lineHeight: 1.65, width: 810, serif: false, bubble: true, remoteImages: false, recovery: true, lineNumbers: true, wrap: true, initialMode: 'visual', splitMode: 'editable', outlineScale: 1 };
 const parser = unified().use(remarkParse).use(remarkGfm);
 const renderer = unified().use(remarkRehype).use(rehypeStringify);
 export const parse = (source: string): any => parser.parse(source);
