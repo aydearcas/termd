@@ -2,7 +2,12 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.0.
+Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.1.
+
+## Versión 1.5.1
+
+- En Visual, los comentarios nuevos se abren junto al fragmento seleccionado y conservan la posición del documento al abrirlos, publicarlos o guardarlos.
+- Las opciones de formato de Nuevo documento tienen el mismo aspecto neutro y se resaltan al pasar el ratón, con foco visible al navegar con el teclado.
 
 ## Funciones
 
