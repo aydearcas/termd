@@ -1,6 +1,6 @@
 # Publicar Termd en GitHub y GitHub Pages
 
-Este paquete contiene Termd 1.5.0, su código fuente y una configuración de publicación. No necesitas instalar Node ni ejecutar comandos para esta primera publicación.
+Este paquete contiene Termd 1.5.1, su código fuente y una configuración de publicación. No necesitas instalar Node ni ejecutar comandos para esta primera publicación.
 
 ## 1. Extraer el paquete
 
@@ -20,7 +20,7 @@ Descomprime `Termd_GitHub.zip`. Abre la carpeta `Termd_GitHub` que contiene `REA
 1. En el repositorio vacío, pulsa el enlace **uploading an existing file**. Si ya contiene archivos, usa **Add file → Upload files**.
 2. Arrastra todos los archivos y carpetas que están DENTRO de `Termd_GitHub` al área de subida. No arrastres la carpeta exterior ni el ZIP.
 3. Incluye `.github` y `.gitignore`. En macOS/Linux, si no ves los nombres que empiezan por punto, activa la visualización de archivos ocultos.
-4. Escribe **Publicar Termd 1.5.0** como mensaje de commit y confirma la subida a `main`.
+4. Escribe **Publicar Termd 1.5.1** como mensaje de commit y confirma la subida a `main`.
 5. Comprueba que `dist`, `src`, `package.json` y `.github` aparezcan directamente en la raíz del repositorio. El flujo debe estar en `.github/workflows/pages.yml`.
 
 El paquete contiene menos de 100 archivos y cada archivo está por debajo del límite de 25 MiB de las subidas por navegador.
@@ -53,7 +53,7 @@ La web y la versión local tienen direcciones distintas: sus borradores recupera
 
 ## 7. Ofrecer una descarga (opcional)
 
-Además de la web, puedes crear una Release `v1.5.0` en GitHub y adjuntar `Termd.html` o el ZIP de la versión local. Así los usuarios podrán elegir entre usar la web y descargar el programa. La Release no es necesaria para publicar la web.
+Además de la web, puedes crear una Release `v1.5.1` en GitHub y adjuntar `Termd.html` o el ZIP de la versión local. Así los usuarios podrán elegir entre usar la web y descargar el programa. La Release no es necesaria para publicar la web.
 
 ## Actualizaciones posteriores
 

@@ -1,4 +1,13 @@
-# Termd 1.5.0
+# Termd 1.5.1
+
+## Novedades de Termd 1.5.1
+
+- En la vista Visual, el editor de comentarios aparece junto a la frase o párrafo seleccionado, sin llevar el documento al principio. Publicar, editar o guardar un comentario mantiene la posición de lectura.
+- Al desplegar Nuevo documento, Markdown y Markdown comentado permanecen neutros. Solo se resalta la opción sobre la que pasa el ratón; al usar el teclado se muestra el foco de navegación.
+
+### Version 1.5.1 — English
+
+Visual comments open next to the selected passage and preserve the document position when opened, published or saved. Both New document format options remain neutral until hovered, while keyboard navigation keeps a visible focus indicator.
 
 ## Novedades de Termd 1.5.0
 

@@ -2,7 +2,12 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.5.0.
+A Markdown editor with visual editing, a code view, and document comments. Version 1.5.1.
+
+## Version 1.5.1
+
+- In Visual, new comments open beside the selected passage without moving the document when opening, publishing or saving them.
+- New document format options share the same neutral appearance and highlight on hover, with visible keyboard navigation.
 
 ## Features
 

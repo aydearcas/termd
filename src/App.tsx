@@ -61,6 +61,7 @@ export default function DocumentEditor({ session, settings, setSettings, registe
   const [showFind, setShowFind] = useState(false), [query, setQuery] = useState(''), [replacement, setReplacement] = useState(''), [matchCase, setMatchCase] = useState(false), [wholeWord, setWholeWord] = useState(false), [inSource, setInSource] = useState(false), [matchIndex, setMatchIndex] = useState(0);
   const [recent, setRecent] = useState<Draft[]>([]);
   const [cardTops, setCardTops] = useState<Record<string, number>>({}), [cardHeight, setCardHeight] = useState(0);
+  const [pendingTop, setPendingTop] = useState(0);
   const fileHandle = useRef<any>(session.handle || null), baseline = useRef<string>(session.baseline || '');
   const savingFile = useRef(false), commentIntent = useRef<ReturnType<typeof anchorFor> | null>(null);
   const [fileSaving, setFileSaving] = useState(false);
@@ -255,7 +256,7 @@ export default function DocumentEditor({ session, settings, setSettings, registe
     beginComment(anchor);
   }
   function beginComment(anchor: ReturnType<typeof anchorFor>) {
-    setPendingAnchor(anchor); setShowComments(true); setEditId(null); setCommentDraft(''); setTimeout(() => root.current?.querySelector<HTMLElement>('#new-comment-text')?.focus(), 50);
+    setPendingAnchor(anchor); setShowComments(true); setEditId(null); setCommentDraft(''); setTimeout(() => root.current?.querySelector<HTMLElement>('#new-comment-text')?.focus({ preventScroll: true }), 50);
   }
   function convertForComment() {
     const anchor = commentIntent.current;
@@ -403,19 +404,51 @@ export default function DocumentEditor({ session, settings, setSettings, registe
     const timer = setTimeout(() => { void saveDraft(doc, resources.current).then(() => setBackupDate(new Date().toISOString())).catch(() => toast(t('backupError'))); }, 900); return () => clearTimeout(timer);
   }, [doc, assetRevision, settings.recovery, modal === 'restore']);
   useEffect(() => { if (!showFind || !query || !matches.length) return; setMatchIndex(0); goRange(matches[0].from, matches[0].to, false); }, [query, matchCase, wholeWord, inSource]);
+  useLayoutEffect(() => {
+    if (!active || !showComments || !root.current) return;
+    const element = root.current;
+    let frame: number | null = null;
+    const positionCards = () => {
+      frame = null;
+      const list = element.querySelector<HTMLElement>('.comment-list'); if (!list) return;
+      const panel = list.closest<HTMLElement>('.comments-panel');
+      const b = bridge.current, next: Record<string, number> = {}, base = list.getBoundingClientRect().top + (panel?.scrollTop || 0);
+      const attachedTop = (anchor: ReturnType<typeof anchorFor>, fallback = 0) => {
+        if (anchor.state !== 'attached') return fallback;
+        if (b.editor && (mode === 'visual' || mode === 'split' && settings.splitMode === 'editable')) {
+          try { return b.editor.view.coordsAtPos(sourceToPM(b, anchor.from, anchor.to).from).top - base; } catch { return fallback; }
+        }
+        if (mode === 'code' && b.code) return (b.code.coordsAtPos(Math.min(sourceToCM(b.source, anchor.from), b.code.state.doc.length))?.top ?? base + fallback) - base;
+        const section = [...element.querySelectorAll('.reading section[data-start]')].reverse().find(node => Number(node.getAttribute('data-start')) <= anchor.from);
+        return section ? section.getBoundingClientRect().top - base : fallback;
+      };
+      const anchoredDraft = mode === 'visual' && !!pendingAnchor && window.innerWidth > 780;
+      const draftTop = anchoredDraft ? Math.max(0, attachedTop(pendingAnchor)) : 0;
+      const draftBottom = anchoredDraft ? draftTop + (element.querySelector<HTMLElement>('.new-card')?.offsetHeight || 280) + 14 : 0;
+      let last = 0;
+      const ordered = mode === 'visual' ? [...filteredComments].sort((a, b) => a.anchor.from - b.anchor.from) : filteredComments;
+      for (const c of ordered) {
+        const height = (element.querySelector<HTMLElement>('#comment-' + c.id)?.offsetHeight || 170) + 14;
+        let top = Math.max(last, attachedTop(c.anchor, last), 0);
+        // Keep the draft at its passage; shift nearby cards rather than covering it.
+        if (anchoredDraft && top < draftBottom && top + height > draftTop) top = draftBottom;
+        next[c.id] = top; last = top + height;
+      }
+      setPendingTop(previous => previous === draftTop ? previous : draftTop);
+      setCardTops(previous => JSON.stringify(previous) === JSON.stringify(next) ? previous : next);
+      setCardHeight(Math.max(last, draftBottom));
+    };
+    const schedule = () => { if (frame === null) frame = requestAnimationFrame(positionCards); };
+    const onScroll = (event: Event) => { if (!(event.target as HTMLElement)?.closest?.('.comments-panel')) schedule(); };
+    positionCards();
+    element.addEventListener('scroll', onScroll, true);
+    const observer = new ResizeObserver(schedule);
+    element.querySelectorAll('.comment-card,.ProseMirror,.reading,.cm-scroller').forEach(node => observer.observe(node));
+    return () => { element.removeEventListener('scroll', onScroll, true); observer.disconnect(); if (frame !== null) cancelAnimationFrame(frame); };
+  }, [active, doc, mode, zoom, settings, filter, showComments, replyId, editId, activeComment, pendingAnchor, assetRevision]);
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       if (!root.current) return;
-      const b = bridge.current, next: Record<string, number> = {}; let last = 0;
-      for (const c of filteredComments) {
-        let anchorTop = last;
-        if (c.anchor.state === 'attached') {
-          if (richActive() && b.editor) { const pos = sourceToPM(b, c.anchor.from, c.anchor.to).from; try { anchorTop = b.editor.view.coordsAtPos(pos).top - (root.current?.querySelector('.comment-list')?.getBoundingClientRect().top || 0); } catch {} }
-          else if (mode === 'code') anchorTop = b.code?.coordsAtPos(Math.min(c.anchor.from, b.code.state.doc.length))?.top || last;
-          else { const section = [...root.current!.querySelectorAll('.reading section[data-start]')].reverse().find(x => Number(x.getAttribute('data-start')) <= c.anchor.from); if (section) anchorTop = section.getBoundingClientRect().top - (root.current?.querySelector('.comment-list')?.getBoundingClientRect().top || 0); }
-        }
-        const top = Math.max(last, anchorTop, 0); next[c.id] = top; last = top + (root.current?.querySelector<HTMLElement>('#comment-' + c.id)?.offsetHeight || 170) + 14;
-      } setCardTops(previous => JSON.stringify(previous) === JSON.stringify(next) ? previous : next); setCardHeight(last);
       const highlights = (CSS as any).highlights;
       if (highlights && (window as any).Highlight) {
         const ranges: Range[] = [], activeRanges: Range[] = [];
@@ -437,6 +470,7 @@ export default function DocumentEditor({ session, settings, setSettings, registe
   const formatButtons = <>{(['bold', 'italic', 'strike', 'inlineCode'] as const).map((key, i) => <Button key={key} icon={[Bold, Italic, Strikethrough, Code2][i]} label={t(key)} compact active={richActive() && !!bridge.current.editor?.isActive(key === 'inlineCode' ? 'code' : key)} disabled={!canEdit} onClick={() => doCommand(key)} />)}</>;
   const appStyle = { '--doc-font': settings.fontSize + 'px', '--doc-line': settings.lineHeight, '--doc-width': settings.width + 'px', '--doc-family': settings.serif ? 'Georgia, "Times New Roman", serif' : '"Segoe UI", system-ui, sans-serif', '--zoom': zoom / 100, '--code-zoom': 1 + (zoom / 100 - 1) * 0.5 } as React.CSSProperties;
 
+  const pendingCard = pendingAnchor ? <div className="comment-card new-card" style={mode === 'visual' ? { top: pendingTop } : undefined}><div className="card-author"><span className="avatar">{(settings.author || 'A').slice(0, 1).toUpperCase()}</span><strong>{settings.author || t('anonymous')}</strong></div><blockquote>{pendingAnchor.quote.slice(0, 180)}</blockquote><textarea id="new-comment-text" value={commentDraft} onChange={e => setCommentDraft(e.target.value)} placeholder={t('commentBody')}/><div className="card-actions"><button className="text-button" onClick={cancelPending}>{t('cancel')}</button><button className="primary-button small" disabled={!commentDraft.trim()} onClick={saveComment}>{t('newComment')}</button></div></div> : null;
   return <div ref={root} data-active-document={active ? 'true' : 'false'} className={`app ${fullscreen ? 'fullscreen-mode' : ''} ${typewriter && mode !== 'read' ? 'typewriter-mode' : ''} ${showComments ? 'has-comments' : ''} ${session.welcome ? 'welcome-document' : ''}`} style={appStyle}>
     <div className="ribbon-shell">
       <div className="tabs-row"><nav className="tabs" aria-label="Ribbon">{(['file', 'home', 'insert', 'review', 'view', ...(inTable ? ['table'] : [])] as TranslationKey[]).map(key => <button className={tab === key ? 'active' : ''} key={key} onClick={() => setTab(key)}>{t(key)}</button>)}</nav><div className="quick-actions"><Button icon={Undo2} label={t('undo')} compact disabled={!history.current.past.length} onClick={() => undo()}/><Button icon={Redo2} label={t('redo')} compact disabled={!history.current.future.length} onClick={() => undo(true)}/><Button icon={Save} label={t('save')} compact onClick={() => void save()}/><Button icon={Maximize2} label={t('fullscreen')} compact active={fullscreen} onClick={() => void toggleFullscreen()}/></div></div>
@@ -460,8 +494,9 @@ export default function DocumentEditor({ session, settings, setSettings, registe
             {mode !== 'code' && <div className="paper-wrap"><div className="document-topline"><span>{mode === 'read' ? t('read') : mode === 'split' ? t(settings.splitMode === 'editable' ? 'visual' : 'read') : t('visual')}</span><span>{info.words.toLocaleString(settings.lang)} {t('words')}</span></div><div className="visual-scroll" onScroll={() => setBubble(null)}><article className="document-surface" aria-label={doc.fileName}>{mode === 'visual' || mode === 'split' && settings.splitMode === 'editable' ? <RichEditor key={`${assetRevision}-${settings.remoteImages}-${settings.lang}`} bridge={bridge} editable/> : <ReadView bridge={bridge} source={doc.source} onSelect={readSelection}/>}</article></div></div>}
           </div>
           {showComments && <aside className="comments-panel"><div className="panel-heading"><span>{t('comments')} <span className="count-badge">{doc.comments.filter(c => c.status === 'open').length}</span></span><Button icon={Plus} label={t('newComment')} compact onClick={newComment}/><Button icon={X} label={t('close')} compact onClick={() => setShowComments(false)}/></div><select className="comment-filter" aria-label={t('comments')} value={filter} onChange={e => setFilter(e.target.value)}>{(['opened', 'all', 'resolved', 'orphan'] as const).map(f => <option key={f} value={f}>{t(f)}</option>)}</select>
-            {pendingAnchor && <div className="comment-card new-card"><div className="card-author"><span className="avatar">{(settings.author || 'A').slice(0, 1).toUpperCase()}</span><strong>{settings.author || t('anonymous')}</strong></div><blockquote>{pendingAnchor.quote.slice(0, 180)}</blockquote><textarea id="new-comment-text" value={commentDraft} onChange={e => setCommentDraft(e.target.value)} placeholder={t('commentBody')}/><div className="card-actions"><button className="text-button" onClick={cancelPending}>{t('cancel')}</button><button className="primary-button small" disabled={!commentDraft.trim()} onClick={saveComment}>{t('newComment')}</button></div></div>}
+            {mode !== 'visual' && pendingCard}
             <div className="comment-list" style={{ height: Math.max(cardHeight, 350) }}>
+              {mode === 'visual' && pendingCard}
               {!filteredComments.length && !pendingAnchor && <div className="comments-empty"><span className="empty-icon"><MessageSquare size={25}/></span><h3>{t('noComments')}</h3><p>{t('noCommentsHelp')}</p><button className="outline-button" onClick={newComment}><Plus size={14}/>{t('newComment')}</button></div>}
               {filteredComments.map(c => <div id={'comment-' + c.id} key={c.id} className={`comment-card ${activeComment === c.id ? 'active' : ''} ${c.status === 'resolved' ? 'resolved-card' : ''}`} style={{ top: cardTops[c.id] || 0 }} onClick={() => setActiveComment(c.id)}>
                 <div className="card-author"><span className="avatar">{c.authorLabel.slice(0, 1).toUpperCase()}</span><div><strong>{c.authorLabel}</strong><time>{dateLabel(c.createdAt, settings.lang)}</time></div><Button icon={c.status === 'resolved' ? Undo2 : Check} label={t(c.status === 'resolved' ? 'reopen' : 'resolve')} compact onClick={() => changeComment(c.id, v => ({ ...v, status: v.status === 'open' ? 'resolved' : 'open', updatedAt: new Date().toISOString() }))}/></div>

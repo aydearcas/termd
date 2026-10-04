@@ -1,6 +1,6 @@
 {
   "name": "termd",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Local Markdown word processor",
   "main": "index.js",
   "scripts": {

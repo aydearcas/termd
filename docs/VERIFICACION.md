@@ -1,3 +1,22 @@
+# Verificación de Termd 1.5.1 — 4 de octubre de 2026
+
+Esta corrección pasó **129 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía y recuperación, 24 de interfaz y comentarios, y 9 nuevas de posición de comentarios y menú de formatos. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html`.
+
+## Correcciones comprobadas
+
+- En un documento largo, seleccionar un fragmento alejado del principio y abrir un comentario en Visual conserva el scroll. El editor aparece junto a la línea seleccionada.
+- Publicar el comentario conserva tanto la posición del documento como la de la tarjeta. Editar y guardar el comentario existente conserva el scroll.
+- Ctrl/⌘+S incluye el comentario en redacción y guarda el .trmd sin desplazar el documento.
+- Los comentarios siguen preservando el scroll independiente en Código y Dividido editable.
+- Al abrir Nuevo documento con el ratón, .md y .trmd tienen el mismo fondo neutro. Solo se destaca la opción bajo el puntero. Las flechas muestran el foco de teclado y Enter crea el formato seleccionado.
+- Se mantienen la conversión a .trmd sin guardar inmediatamente, el guardado posterior, los anclajes y las respuestas, la recuperación, las pestañas, los modos de edición, Concentración y Pantalla completa.
+
+También se verificó la web compilada bajo `/termd/` y `Termd.html` abierto desde `file://`, incluyendo la primera conversión de Markdown a .trmd, el comentario junto al fragmento, publicar y guardar conservando el scroll, el menú de formatos, la versión mostrada en Ayuda y el inicio móvil de 390 px. Se inspeccionaron capturas del comentario abierto y publicado. No se registraron excepciones del navegador en las suites completadas.
+
+Las pruebas usan Chromium 153. Los adaptadores simulan selectores y escrituras; no se han probado los diálogos del sistema operativo en el ordenador del usuario. La primera ejecución concurrente de la suite de interfaz agotó el tiempo de una captura; la ejecución aislada completó sus 24 comprobaciones.
+
+## Registro de versiones anteriores
+
 # Verificación de Termd 1.5.0 — 4 de octubre de 2026
 
 Esta actualización pasó **187 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía y recuperación, 15 de imágenes, 15 de vista dividida, 16 de cinta de tabla, 12 de índice, 24 de interfaz y comentarios, y 9 de distribución y recursos. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html`.
