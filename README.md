@@ -2,11 +2,12 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.3.1.
+A Markdown editor with visual editing, a code view, and document comments. Version 1.4.0.
 
 ## Features
 
-- English by default, with a welcome document in English followed by Spanish.
+- English by default. Empty startup with Open document, Continue where you left off, and a welcome document in the interface language.
+- Configurable bracket auto-closing in Code, independent fullscreen and caret-centered Focus mode, and zoom in both editors.
 
 - Visual and Markdown code editors, with a split view that supports editing in both panes and keeps content synchronized.
 - Multiple documents in tabs, a resizable document outline, and contextual table tools.

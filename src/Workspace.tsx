@@ -1,6 +1,6 @@
 import React, { Activity, useCallback, useEffect, useRef, useState } from 'react';
 import { X, Plus, Save, FileText, Package, Pencil, CircleHelp, Settings as Gear, Monitor, Heart } from 'lucide-react';
-import DocumentEditor, { fresh, WELCOME } from './App';
+import DocumentEditor, { fresh } from './App';
 import { defaultSettings, uid, type Settings, type DocumentFormat } from './core';
 import type { Session, SessionInput, DocumentAPI, Metadata } from './workspace-types';
 import { EmptyWorkspace, type EmptyModal } from './EmptyWorkspace';
@@ -13,7 +13,7 @@ const SUPPORT_URL = 'https://paypal.me/aydearcas';
 
 export default function Workspace() {
   const [settings, setSettings] = useState<Settings>(() => { try { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); return { ...defaultSettings, ...saved, splitMode: localStorage.getItem('wordmd.splitMode.version') === '2' ? saved.splitMode || defaultSettings.splitMode : defaultSettings.splitMode }; } catch { return defaultSettings; } });
-  const [sessions, setSessions] = useState<Session[]>(() => { try { if (localStorage.getItem('wordmd.workspace.empty') === 'true') return []; } catch {} return [{ id: uid(), doc: fresh(WELCOME, settings.lang === 'en' ? 'Welcome.md' : 'Bienvenida.md'), welcome: true }]; });
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [active, setActive] = useState(sessions[0]?.id || ''), [metadata, setMetadata] = useState<Record<string, Metadata>>({});
   const [emptyModal, setEmptyModal] = useState<EmptyModal>(null);
   const apis = useRef(new Map<string, DocumentAPI>()), sessionsRef = useRef(sessions); sessionsRef.current = sessions;
