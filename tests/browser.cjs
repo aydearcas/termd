@@ -14,7 +14,7 @@ const { spawn } = require('node:child_process');
   browser=await chromium.launch({headless:true,args:packed.args,executablePath});
   const context=await browser.newContext({viewport:{width:1440,height:980},permissions:['clipboard-read','clipboard-write']});
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));const nativeLocator=page.locator.bind(page);page.locator=(selector,...args)=>nativeLocator('.app[data-active-document="true"] '+selector,...args);page.on('dialog',d=>d.accept());
-  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.goto('http://127.0.0.1:5178/'); await page.locator('.ProseMirror h1').waitFor();
+  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.addInitScript(() => { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); localStorage.setItem('wordmd.settings', JSON.stringify({...saved, lang: 'es'})); });await page.goto('http://127.0.0.1:5178/');await page.getByRole('button',{name:/^(Welcome document|Documento de bienvenida)$/}).click(); await page.locator('.ProseMirror h1').waitFor();
   let passed=0;const ok=(name)=>{passed++;console.log('PASS '+name)};
   const tab=async name=>page.locator('.tabs').getByRole('button',{name,exact:true}).click();
   const mode=async name=>{await page.locator('.status-modes').getByRole('button',{name,exact:true}).click();await page.waitForTimeout(80)};

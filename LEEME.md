@@ -1,8 +1,26 @@
-# Termd 1.3.1
+# Termd 1.4.0
+
+## Novedades de Termd 1.4.0
+
+- Inicio vacío: Abrir documento, Continúa donde lo dejaste y Documento de bienvenida. No aparece recuperación ni bienvenida de forma automática.
+- La bienvenida se abre en el idioma de la interfaz. Los borradores anteriores permanecen disponibles en la recuperación local.
+- Cierre automático de (), [] y {} en Código y Dividido, activado por defecto y configurable en General. No se cambia la escritura de asteriscos.
+- Disposición aparece a la izquierda de Vista. Pantalla completa amplía el editor y se abandona con Esc o su botón de salida.
+- Concentración mantiene la línea del cursor centrada en Visual, Código y Dividido. Está desactivada inicialmente. Puedes desplazarte manualmente; el seguimiento se retoma al escribir o mover el cursor. En Lectura no se activa.
+- El zoom cambia ambos editores: con un zoom del 120 %, Visual se muestra al 120 % y Código al 110 %.
+- Estadísticas del documento incluye una descripción al pasar el ratón y una explicación más clara del conteo de palabras.
+
+Para actualizar primero develop y publicar después en main, conservando ambas ramas, consulta **ACTUALIZAR_GITHUB.md**.
+
+### Version 1.4.0 — English
+
+Start with an empty workspace and choose Open document, Continue where you left off, or Welcome document. The welcome opens in your interface language; drafts remain available on request. Use + to create Markdown or commented Markdown.
+
+Code automatically closes parentheses, square brackets and braces by default. Disable this in Settings → General if preferred. Asterisk typing remains unchanged. Layout now comes before View. Fullscreen and Focus mode are independent; Focus mode keeps the caret line centered in either editor and resumes after manual scrolling when you type or move the caret. Zoom also scales Code at half the variation of Visual relative to 100%. Document statistics has updated labels and help text.
 
 ## Novedades de Termd 1.3.1
 
-- Creación explícita de Markdown (.md) o Markdown comentado (.trmd), desde Archivo → Nuevo, + y la pantalla vacía.
+- Creación explícita de Markdown (.md) o Markdown comentado (.trmd), desde Archivo → Nuevo y +, también cuando el espacio de trabajo está vacío.
 - Guardar y Guardar como mantienen el formato. Guardar como .trmd convierte el documento activo; Guardar .md desde .trmd crea una copia sin comentarios.
 - .trmd reúne texto, comentarios, respuestas, estados, anclajes e imágenes locales. No se abren paquetes ZIP antiguos ni JSON auxiliares.
 - Icono distinto en las pestañas de .trmd: folio redondeado sin pliegue con el símbolo de Termd, conservando la identidad visual.
@@ -147,7 +165,7 @@ La distribución en `dist/` ya está compilada y no requiere estas operaciones p
 
 Extract the entire `Termd` folder and double-click `Iniciar_Termd.cmd` (Node.js 20+ required), or run `node launch.cjs`. Termd opens at `http://127.0.0.1:43821`. Keep the terminal open while working. Alternatively, open the self-contained `Termd.html` in Chrome or Edge; clipboard and direct file access may be restricted in this mode.
 
-Change the interface to English in **Settings → Interface language**. Open a Markdown file, edit in Visual or Code, and add comments in the right margin. Choose Markdown (.md) or commented Markdown (.trmd) when creating a document. Save preserves the selected format. TRMD keeps text, comments and local images together; Save .md produces a text-only copy while keeping the native document open. Legacy ZIP packages are no longer opened. Draft recovery is stored in your browser and does not replace file export. Advanced Markdown constructs are preserved in protected blocks and can be edited in Code. Core operation works offline.
+English is the default; select English or Spanish in **Settings → General → Interface language**. Open a Markdown file, edit in Visual or Code, and add comments in the right margin. Choose Markdown (.md) or commented Markdown (.trmd) when creating a document. Save preserves the selected format. TRMD keeps text, comments and local images together; Save .md produces a text-only copy while keeping the native document open. Legacy ZIP packages are no longer opened. Draft recovery is stored in your browser and does not replace file export. Advanced Markdown constructs are preserved in protected blocks and can be edited in Code. Core operation works offline.
 
 ## Licencia y apoyo al proyecto
 

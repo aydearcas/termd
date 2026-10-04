@@ -1,3 +1,26 @@
+# Verificación de Termd 1.4.0 — 4 de octubre de 2026
+
+La actualización pasó **134 comprobaciones automatizadas**: 16 del núcleo, 21 del nuevo flujo de edición, 19 de pestañas, 24 de formatos y guardado, 11 de pantalla vacía y recuperación, 15 de vista dividida, 16 de cinta contextual de tabla y 12 de índice redimensionable. TypeScript y la compilación de producción se completaron correctamente; se regeneró el HTML independiente.
+
+## Comprobaciones nuevas
+
+- Inicio limpio sin documentos ni diálogos automáticos, con tres opciones y recuperación abierta expresamente.
+- Bienvenida únicamente en el idioma elegido, con una cabecera principal; las preferencias de idioma guardadas se mantienen.
+- Cierre de (), [] y {}: cursor interior, salto sobre el cierre existente, eliminación del par vacío, envoltura de selecciones y deshacer/rehacer compartido.
+- Persistencia de la opción al recargar; la escritura de asteriscos, listas, separadores, comillas y backticks conserva su funcionamiento.
+- Orden Disposición → Vista → Zoom, nombres y descripciones de Concentración, Pantalla completa y Estadísticas del documento.
+- Visual al 120 % y Código al 110 %; restablecimiento al 100 %.
+- Concentración en ambos editores y dividido, tanto en la primera como en la última línea, al escribir dentro de tablas y al cambiar zoom o tamaño de ventana.
+- El desplazamiento manual no se revierte hasta nueva actividad del cursor. Se conserva el foco y el área de trabajo permanece fija en dividido.
+- Entrada en pantalla completa nativa y salida mediante botón o Esc; Concentración conserva su estado independiente.
+- Inicio sin desbordamiento horizontal en una ventana de 390 px.
+
+Los adaptadores de las pruebas de formatos simulan los permisos y la escritura de archivos; los selectores del sistema operativo no se han probado en el ordenador del usuario. Las pruebas del navegador se ejecutaron con Chromium 153. En navegadores que restringen Fullscreen, la aplicación conserva como alternativa la vista ampliada del editor.
+
+También se comprobó la web compilada bajo `/termd/`, su entrada y salida de pantalla completa, el inicio móvil y el HTML independiente abierto desde `file://`, incluyendo el cierre de símbolos. No se registraron excepciones del navegador.
+
+## Registro de versiones anteriores
+
 # Verificación de Termd 1.3.0
 
 La versión 1.3.0 pasó **146 comprobaciones automatizadas:** 16 del núcleo, 24 de interfaz, 19 de pestañas, 11 de pantalla vacía y recuperación, 15 de dividido, 16 de cinta contextual de tabla, 12 de índice redimensionable, 9 de distribución y 24 de formatos/guardado. TypeScript/Vite y el HTML autocontenido se generaron correctamente. Las comprobaciones de escritura directa usan un adaptador de archivos simulado; los selectores del sistema operativo no se han probado en el equipo Windows del usuario.

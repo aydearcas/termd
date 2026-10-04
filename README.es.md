@@ -2,11 +2,12 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.3.1.
+Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.4.0.
 
 ## Funciones
 
-- Inglés por defecto y bienvenida bilingüe: inglés primero y español después.
+- Inglés por defecto. Inicio vacío con Abrir documento, Continúa donde lo dejaste y bienvenida en el idioma de la interfaz.
+- Cierre de símbolos configurable en Código, Pantalla completa y Concentración independientes, y zoom en ambos editores.
 
 - Edición visual y de código; vista dividida con ambas vistas editables y sincronizadas.
 - Varios documentos en pestañas, índice redimensionable y herramientas de tablas.

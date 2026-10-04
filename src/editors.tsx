@@ -8,14 +8,15 @@ import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { DOMParser as PMParser, Fragment, type Node as PMNode } from '@tiptap/pm/model';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection } from '@codemirror/view';
-import { EditorState, Compartment } from '@codemirror/state';
+import { EditorState, Compartment, Prec } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { defaultKeymap } from '@codemirror/commands';
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import DOMPurify from 'dompurify';
 import { alignPositions, blocksOf, cmText, cmToSource, escapeHTML, renderAST, safeURL, signature, textPositions, type Block, type Comment, type Settings } from './core';
 
-export interface EditorBridge { editor: Editor | null; code: EditorView | null; blocks: Block[]; source: string; positions: Map<number, number>; comments: Comment[]; active: string | null; settings: Settings; assets: Map<string, string>; onChange: (s: string, origin: 'visual' | 'code') => void; onSelection: (from: number, to: number, rect?: DOMRect) => void; onNotice: (s: string) => void; t: (k: any) => string; onCode: () => void; onComment: (id: string) => void; onFocus?: (origin: 'visual' | 'code') => void; onNavigate?: (position: number, origin: 'visual' | 'code') => void; onTableContext?: (active: boolean) => void; syncCode?: () => void; }
+export interface EditorBridge { editor: Editor | null; code: EditorView | null; blocks: Block[]; source: string; positions: Map<number, number>; comments: Comment[]; active: string | null; settings: Settings; assets: Map<string, string>; onChange: (s: string, origin: 'visual' | 'code') => void; onSelection: (from: number, to: number, rect?: DOMRect) => void; onNotice: (s: string) => void; t: (k: any) => string; onCode: () => void; onComment: (id: string) => void; onFocus?: (origin: 'visual' | 'code') => void; onNavigate?: (position: number, origin: 'visual' | 'code') => void; onTableContext?: (active: boolean) => void; onCaretActivity?: (origin: 'visual' | 'code') => void; syncCode?: () => void; }
 const Ids = Extension.create({ name: 'markdownIds', addGlobalAttributes() { return [{ types: ['paragraph', 'heading', 'blockquote', 'bulletList', 'orderedList', 'taskList', 'table', 'codeBlock', 'horizontalRule', 'advanced'], attributes: { mdId: { default: null, parseHTML: el => el.getAttribute('data-md-id'), renderHTML: a => a.mdId ? { 'data-md-id': a.mdId } : {} } } }]; } });
 const CellAlignment = Extension.create({ name: 'cellAlignment', addGlobalAttributes() { return [{ types: ['tableCell', 'tableHeader'], attributes: { align: { default: null, parseHTML: el => el.getAttribute('align') || el.style.textAlign || null, renderHTML: a => a.align ? { style: 'text-align:' + a.align, align: a.align } : {} } } }]; } });
 const Advanced = (bridge: React.RefObject<EditorBridge>) => TiptapNode.create({
@@ -137,8 +138,8 @@ export function RichEditor({ bridge, editable }: { bridge: React.RefObject<Edito
         return false;
       } }, handlePaste(_view, event) { const html = event.clipboardData?.getData('text/html') || ''; if (hasMergedCells(html)) { bridge.current.onNotice(bridge.current.t('mergedPaste')); return true; } if (html) { bridge.current.editor?.commands.insertContent(safeHTML(html, 'editor', bridge.current)); return true; } return false; }, transformPastedHTML: html => safeHTML(html, 'editor', bridge.current) },
       onFocus: () => bridge.current.onFocus?.('visual'),
-      onUpdate: () => { bridge.current.onChange('', 'visual'); bridge.current.onTableContext?.(editor.isActive('table')); },
-      onSelectionUpdate({ editor, transaction }) { const b = bridge.current; b.onTableContext?.(editor.isActive('table')); const s = pmToSource(b, editor.state.selection.from, editor.state.selection.to); const range = window.getSelection(); const rect = range?.rangeCount ? range.getRangeAt(0).getBoundingClientRect() : undefined; if (editor.isFocused) { b.onSelection(s.from, s.to, rect); if (transaction.getMeta('pointer')) b.onNavigate?.(pmToSource(b, editor.state.selection.head, editor.state.selection.head).from, 'visual'); } }
+      onUpdate: () => { bridge.current.onChange('', 'visual'); bridge.current.onTableContext?.(editor.isActive('table')); if (editor.isFocused) bridge.current.onCaretActivity?.('visual'); },
+      onSelectionUpdate({ editor, transaction }) { const b = bridge.current; b.onTableContext?.(editor.isActive('table')); const s = pmToSource(b, editor.state.selection.from, editor.state.selection.to); const range = window.getSelection(); const rect = range?.rangeCount ? range.getRangeAt(0).getBoundingClientRect() : undefined; if (editor.isFocused) { b.onCaretActivity?.('visual'); b.onSelection(s.from, s.to, rect); if (transaction.getMeta('pointer')) b.onNavigate?.(pmToSource(b, editor.state.selection.head, editor.state.selection.head).from, 'visual'); } }
     });
     bridge.current.editor = editor; loadRich(bridge.current); bridge.current.onTableContext?.(editor.isActive('table'));
     return () => { bridge.current.editor = null; editor.destroy(); };
@@ -146,17 +147,17 @@ export function RichEditor({ bridge, editable }: { bridge: React.RefObject<Edito
   useEffect(() => { bridge.current.editor?.setEditable(editable); }, [editable]);
   return <div className="rich-host" ref={host} />;
 }
-export function SourceEditor({ bridge, source, settings }: { bridge: React.RefObject<EditorBridge>; source: string; settings: Settings }) {
+export function SourceEditor({ bridge, source, settings, zoom }: { bridge: React.RefObject<EditorBridge>; source: string; settings: Settings; zoom: number }) {
   const host = useRef<HTMLDivElement>(null), config = useRef(new Compartment()), syncing = useRef(false);
   useEffect(() => {
-    const theme = EditorView.theme({ '&': { height: '100%', backgroundColor: '#fff', fontSize: '14px' }, '.cm-scroller': { overflow: 'auto', fontFamily: 'Consolas, ui-monospace, monospace', lineHeight: '1.7' }, '.cm-content': { padding: '28px 20px 140px', minHeight: '100%' }, '.cm-gutters': { backgroundColor: '#fbfcfd', color: '#8590a2', border: 'none' }, '&.cm-focused': { outline: 'none' } });
+    const theme = EditorView.theme({ '&': { height: '100%', backgroundColor: '#fff', fontSize: 'calc(14px * var(--code-zoom, 1))' }, '.cm-scroller': { overflow: 'auto', fontFamily: 'Consolas, ui-monospace, monospace', lineHeight: '1.7' }, '.cm-content': { padding: '28px 20px 140px', minHeight: '100%' }, '.cm-gutters': { backgroundColor: '#fbfcfd', color: '#8590a2', border: 'none' }, '&.cm-focused': { outline: 'none' } });
     const editor = new EditorView({ parent: host.current!, state: EditorState.create({ doc: cmText(bridge.current.source), extensions: [markdown(), syntaxHighlighting(defaultHighlightStyle), bracketMatching(), drawSelection(), highlightActiveLine(), keymap.of(defaultKeymap.filter(k => !['Mod-z', 'Mod-y', 'Mod-Shift-z'].includes(k.key || ''))), theme, config.current.of([]), EditorView.domEventHandlers({ focus: () => { bridge.current.onFocus?.('code'); return false; }, mouseup: (event, view) => { if (event.button === 0) requestAnimationFrame(() => { if (bridge.current.code === view && view.hasFocus) bridge.current.onNavigate?.(cmToSource(bridge.current.source, view.state.selection.main.head), 'code'); }); return false; } }), EditorView.contentAttributes.of({ 'aria-label': 'Markdown source editor' }), EditorView.updateListener.of(u => {
       if (u.docChanged && !syncing.current && u.state.doc.toString() !== cmText(bridge.current.source)) {
         const before = bridge.current.source, eol = before.includes('\r\n') ? '\r\n' : '\n'; const edits: { from: number; to: number; value: string }[] = [];
         u.changes.iterChanges((from, to, _f, _t, inserted) => edits.push({ from: cmToSource(before, from), to: cmToSource(before, to), value: inserted.toString().replace(/\n/g, eol) }));
         let next = before; for (const e of edits.reverse()) next = next.slice(0, e.from) + e.value + next.slice(e.to); bridge.current.onChange(next, 'code');
       }
-      if (!syncing.current && editor.hasFocus && (u.selectionSet || u.docChanged)) { const s = u.state.selection.main; const coords = editor.coordsAtPos(s.to); bridge.current.onSelection(cmToSource(bridge.current.source, s.from), cmToSource(bridge.current.source, s.to), coords ? new DOMRect(coords.left, coords.top, 1, coords.bottom - coords.top) : undefined); }
+      if (!syncing.current && editor.hasFocus && (u.selectionSet || u.docChanged)) { const s = u.state.selection.main; const coords = editor.coordsAtPos(s.to); bridge.current.onSelection(cmToSource(bridge.current.source, s.from), cmToSource(bridge.current.source, s.to), coords ? new DOMRect(coords.left, coords.top, 1, coords.bottom - coords.top) : undefined); bridge.current.onCaretActivity?.('code'); }
     })] }) });
     bridge.current.code = editor;
     bridge.current.syncCode = () => {
@@ -171,7 +172,8 @@ export function SourceEditor({ bridge, source, settings }: { bridge: React.RefOb
     return () => { bridge.current.code = null; bridge.current.syncCode = undefined; editor.destroy(); };
   }, []);
   useEffect(() => { bridge.current.syncCode?.(); }, [source]);
-  useEffect(() => { bridge.current.code?.dispatch({ effects: config.current.reconfigure([...(settings.lineNumbers ? [lineNumbers()] : []), ...(settings.wrap ? [EditorView.lineWrapping] : [])]) }); }, [settings.lineNumbers, settings.wrap]);
+  useEffect(() => { bridge.current.code?.dispatch({ effects: config.current.reconfigure([...(settings.lineNumbers ? [lineNumbers()] : []), ...(settings.wrap ? [EditorView.lineWrapping] : []), ...(settings.autoClose ? [Prec.highest(EditorState.languageData.of(() => [{ closeBrackets: { brackets: ['(', '[', '{'] } }])), closeBrackets(), Prec.highest(keymap.of(closeBracketsKeymap))] : [])]) }); }, [settings.lineNumbers, settings.wrap, settings.autoClose]);
+  useEffect(() => { bridge.current.code?.requestMeasure(); }, [zoom]);
   return <div className="source-host" ref={host} />;
 }
 export function ReadView({ bridge, source, onSelect }: { bridge: React.RefObject<EditorBridge>; source: string; onSelect: () => void }) {

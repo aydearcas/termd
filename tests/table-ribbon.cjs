@@ -7,7 +7,7 @@ const assert = require('node:assert/strict'), fs = require('node:fs/promises'), 
   browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || path.resolve('../qa-browser/chromium') });
   const context = await browser.newContext({ viewport: { width: 1500, height: 1000 } }), page = await context.newPage(), errors = [];
   page.on('pageerror', e => errors.push(e.message)); await page.addInitScript(() => localStorage.setItem('wordmd.settings', JSON.stringify({ recovery: false })));
-  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.goto('http://127.0.0.1:5184/'); await page.locator('.ProseMirror').waitFor();
+  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.addInitScript(() => { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); localStorage.setItem('wordmd.settings', JSON.stringify({...saved, lang: 'es'})); });await page.goto('http://127.0.0.1:5184/');await page.getByRole('button',{name:/^(Welcome document|Documento de bienvenida)$/}).click(); await page.locator('.ProseMirror').waitFor();
   const app = () => page.locator('.app[data-active-document="true"]:visible'), nav = () => app().locator('.tabs'), ribbon = () => app().locator('.ribbon');
   const tab = name => nav().getByRole('button', { name, exact: true }), tableTab = () => tab('Tabla');
   const source = '# Tabla contextual\n\nAntes de la tabla.\n\n| A | B |\n| --- | --- |\n| Uno | Dos |\n\nDespués de la tabla.\n';
