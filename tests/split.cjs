@@ -9,7 +9,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
   page.on('pageerror', e => errors.push(e.message));
   // Previous releases persisted preview as their automatic default.
   await page.addInitScript(() => { if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({ splitMode: 'preview', recovery: false })); });
-  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.addInitScript(() => { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); localStorage.setItem('wordmd.settings', JSON.stringify({...saved, lang: 'es'})); });await page.goto('http://127.0.0.1:5183/');await page.getByRole('button',{name:/^(Welcome document|Documento de bienvenida)$/}).click();
+  await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.addInitScript(() => { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); localStorage.setItem('wordmd.settings', JSON.stringify({...saved, lang: 'es'})); });await page.goto('http://127.0.0.1:5183/');await page.getByRole('link',{name:/^(Welcome document|Documento de Bienvenida)$/}).click();
   const app = () => page.locator('.app[data-active-document="true"]');
   const mode = async name => { await app().locator('.status-modes').getByRole('button', { name, exact: true }).click(); await page.waitForTimeout(100); };
   const preference = async value => { await page.getByRole('button', { name: 'Configuración', exact: true }).click(); await app().getByLabel('Modo de vista dividida').selectOption(value); await app().locator('.modal-heading').getByRole('button', { name: 'Cerrar', exact: true }).click(); };
@@ -20,7 +20,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
   let passed = 0; const ok = name => { passed++; console.log('PASS ' + name); };
   await mode('Dividido'); await app().locator('.ProseMirror').waitFor(); assert.ok(await app().locator('.ProseMirror').isVisible());
   assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('wordmd.settings')).splitMode), 'editable'); ok('Editable split is the default, including migration from the old default');
-  await preference('preview'); assert.ok(await app().locator('.reading').isVisible()); await page.reload(); await page.getByRole('button',{name:'Documento de bienvenida',exact:true}).click(); await mode('Dividido'); assert.ok(await app().locator('.reading').isVisible()); ok('Explicit reading preference remains available and persists after reload');
+  await preference('preview'); assert.ok(await app().locator('.reading').isVisible()); await page.reload(); await page.getByRole('link',{name:'Documento de Bienvenida',exact:true}).click(); await mode('Dividido'); assert.ok(await app().locator('.reading').isVisible()); ok('Explicit reading preference remains available and persists after reload');
   await preference('editable');
   const source = Array.from({ length: 120 }, (_, i) => `## Sección ${i + 1} 🧭\r\n\r\nPárrafo ${i + 1}. Un **texto** con acentos, &amp; y un [enlace](https://example.com). ${'Contenido que permite comprobar el desplazamiento. '.repeat(3)}`).join('\r\n\r\n');
   await app().locator('input[type=file]').first().setInputFiles({ name: 'scroll.md', mimeType: 'text/markdown', buffer: Buffer.from('\uFEFF' + source) }); await page.getByRole('tab', { name: 'scroll.md', exact: true }).waitFor(); await mode('Dividido');

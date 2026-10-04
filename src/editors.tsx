@@ -4,7 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { NodeSelection, Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 import { DOMParser as PMParser, Fragment, type Node as PMNode } from '@tiptap/pm/model';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection } from '@codemirror/view';
@@ -14,9 +14,11 @@ import { defaultKeymap } from '@codemirror/commands';
 import { syntaxHighlighting, defaultHighlightStyle, bracketMatching } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import DOMPurify from 'dompurify';
+import { imageDimension } from './image-format';
+import { imageNodeView } from './image-node-view';
 import { alignPositions, blocksOf, cmText, cmToSource, escapeHTML, renderAST, safeURL, signature, textPositions, type Block, type Comment, type Settings } from './core';
 
-export interface EditorBridge { editor: Editor | null; code: EditorView | null; blocks: Block[]; source: string; positions: Map<number, number>; comments: Comment[]; active: string | null; settings: Settings; assets: Map<string, string>; onChange: (s: string, origin: 'visual' | 'code') => void; onSelection: (from: number, to: number, rect?: DOMRect) => void; onNotice: (s: string) => void; t: (k: any) => string; onCode: () => void; onComment: (id: string) => void; onFocus?: (origin: 'visual' | 'code') => void; onNavigate?: (position: number, origin: 'visual' | 'code') => void; onTableContext?: (active: boolean) => void; onCaretActivity?: (origin: 'visual' | 'code') => void; syncCode?: () => void; }
+export interface EditorBridge { editor: Editor | null; code: EditorView | null; blocks: Block[]; source: string; positions: Map<number, number>; comments: Comment[]; active: string | null; settings: Settings; assets: Map<string, string>; onChange: (s: string, origin: 'visual' | 'code', group?: boolean) => void; onSelection: (from: number, to: number, rect?: DOMRect) => void; onNotice: (s: string) => void; t: (k: any) => string; onCode: () => void; onComment: (id: string) => void; onFocus?: (origin: 'visual' | 'code') => void; onNavigate?: (position: number, origin: 'visual' | 'code') => void; onTableContext?: (active: boolean) => void; onCaretActivity?: (origin: 'visual' | 'code') => void; syncCode?: () => void; }
 const Ids = Extension.create({ name: 'markdownIds', addGlobalAttributes() { return [{ types: ['paragraph', 'heading', 'blockquote', 'bulletList', 'orderedList', 'taskList', 'table', 'codeBlock', 'horizontalRule', 'advanced'], attributes: { mdId: { default: null, parseHTML: el => el.getAttribute('data-md-id'), renderHTML: a => a.mdId ? { 'data-md-id': a.mdId } : {} } } }]; } });
 const CellAlignment = Extension.create({ name: 'cellAlignment', addGlobalAttributes() { return [{ types: ['tableCell', 'tableHeader'], attributes: { align: { default: null, parseHTML: el => el.getAttribute('align') || el.style.textAlign || null, renderHTML: a => a.align ? { style: 'text-align:' + a.align, align: a.align } : {} } } }]; } });
 const Advanced = (bridge: React.RefObject<EditorBridge>) => TiptapNode.create({
@@ -28,10 +30,16 @@ const Advanced = (bridge: React.RefObject<EditorBridge>) => TiptapNode.create({
 });
 const SafeImage = (bridge: React.RefObject<EditorBridge>) => TiptapNode.create({
   name: 'image', inline: true, group: 'inline', atom: true, draggable: true,
-  addAttributes() { return { src: { default: '', parseHTML: el => el.getAttribute('data-image-src') }, alt: { default: '', parseHTML: el => el.getAttribute('data-image-alt') } }; },
+  addAttributes() { return {
+    src: { default: '', parseHTML: el => el.getAttribute('data-image-src') },
+    alt: { default: '', parseHTML: el => el.getAttribute('data-image-alt') },
+    title: { default: null, parseHTML: el => el.getAttribute('data-image-title') },
+    width: { default: null, parseHTML: el => imageDimension(el.getAttribute('data-image-width')) },
+    height: { default: null, parseHTML: el => imageDimension(el.getAttribute('data-image-height')) }
+  }; },
   parseHTML() { return [{ tag: 'span[data-image-src]' }]; },
-  renderHTML({ HTMLAttributes }) { return ['span', { 'data-image-src': HTMLAttributes.src, 'data-image-alt': HTMLAttributes.alt }, HTMLAttributes.alt || '▧']; },
-  addNodeView() { return ({ node }) => { const dom = document.createElement('span'); dom.className = 'image-node'; dom.contentEditable = 'false'; const src = imageSource(node.attrs.src, bridge.current); if (src) { const img = document.createElement('img'); img.src = src; img.alt = node.attrs.alt; dom.append(img); } else { dom.classList.add('image-placeholder'); dom.textContent = '▧ ' + (node.attrs.alt || bridge.current.t('image')) + ' · ' + bridge.current.t(/^https?:/i.test(node.attrs.src) ? 'imageBlocked' : 'imageMissing'); } return { dom }; }; }
+  renderHTML({ HTMLAttributes: a }) { return ['span', { 'data-image-src': a.src, 'data-image-alt': a.alt, 'data-image-title': a.title, 'data-image-width': a.width, 'data-image-height': a.height }, a.alt || '▧']; },
+  addNodeView() { return props => imageNodeView(props, bridge, imageSource); }
 });
 export function imageSource(src: string, b: Pick<EditorBridge, 'settings' | 'assets'>) { if (!safeURL(src, true)) return ''; return b.assets.get(src) || b.assets.get(src.split('/').pop() || '') || (b.settings.remoteImages && /^https?:\/\//i.test(src) ? src : ''); }
 export const hasMergedCells = (html: string) => [...html.matchAll(/\b(?:colspan|rowspan)\s*=\s*["']?([0-9]+)/gi)].some(x => Number(x[1]) > 1);
@@ -42,6 +50,13 @@ export function safeHTML(html: string, images: 'editor' | 'read', b: EditorBridg
   template.content.querySelectorAll('img').forEach(img => {
     const src = img.getAttribute('src') || '', alt = img.getAttribute('alt') || '';
     const span = document.createElement('span'); span.dataset.imageSrc = src; span.dataset.imageAlt = alt;
+    if (img.hasAttribute('title')) span.dataset.imageTitle = img.getAttribute('title')!;
+    const width = imageDimension(img.getAttribute('width')), height = imageDimension(img.getAttribute('height'));
+    if (width) span.dataset.imageWidth = String(width);
+    if (height) span.dataset.imageHeight = String(height);
+    img.style.width = width ? `calc(${width}px * var(--zoom, 1))` : '';
+    img.style.height = !width && height ? `calc(${height}px * var(--zoom, 1))` : '';
+    img.referrerPolicy = 'no-referrer';
     if (images === 'editor') { span.textContent = alt || '▧'; }
     else { const allowed = imageSource(src, b); if (allowed) { img.replaceWith(span); img.src = allowed; span.append(img); } else { span.className = 'image-placeholder'; span.textContent = '▧ ' + (alt || b.t('image')) + ' · ' + b.t(/^https?:/i.test(src) ? 'imageBlocked' : 'imageMissing'); } }
     if (images === 'editor' || !span.contains(img)) img.replaceWith(span);
@@ -138,8 +153,8 @@ export function RichEditor({ bridge, editable }: { bridge: React.RefObject<Edito
         return false;
       } }, handlePaste(_view, event) { const html = event.clipboardData?.getData('text/html') || ''; if (hasMergedCells(html)) { bridge.current.onNotice(bridge.current.t('mergedPaste')); return true; } if (html) { bridge.current.editor?.commands.insertContent(safeHTML(html, 'editor', bridge.current)); return true; } return false; }, transformPastedHTML: html => safeHTML(html, 'editor', bridge.current) },
       onFocus: () => bridge.current.onFocus?.('visual'),
-      onUpdate: () => { bridge.current.onChange('', 'visual'); bridge.current.onTableContext?.(editor.isActive('table')); if (editor.isFocused) bridge.current.onCaretActivity?.('visual'); },
-      onSelectionUpdate({ editor, transaction }) { const b = bridge.current; b.onTableContext?.(editor.isActive('table')); const s = pmToSource(b, editor.state.selection.from, editor.state.selection.to); const range = window.getSelection(); const rect = range?.rangeCount ? range.getRangeAt(0).getBoundingClientRect() : undefined; if (editor.isFocused) { b.onCaretActivity?.('visual'); b.onSelection(s.from, s.to, rect); if (transaction.getMeta('pointer')) b.onNavigate?.(pmToSource(b, editor.state.selection.head, editor.state.selection.head).from, 'visual'); } }
+      onUpdate: ({ transaction }) => { bridge.current.onChange('', 'visual', !transaction.getMeta('imageResize')); bridge.current.onTableContext?.(editor.isActive('table')); if (editor.isFocused) bridge.current.onCaretActivity?.('visual'); },
+      onSelectionUpdate({ editor, transaction }) { const b = bridge.current; b.onTableContext?.(editor.isActive('table')); const s = pmToSource(b, editor.state.selection.from, editor.state.selection.to); const range = window.getSelection(); const imageSelected = editor.state.selection instanceof NodeSelection && editor.state.selection.node.type.name === 'image'; const rect = !imageSelected && range?.rangeCount ? range.getRangeAt(0).getBoundingClientRect() : undefined; if (editor.isFocused) { b.onCaretActivity?.('visual'); b.onSelection(s.from, s.to, rect); if (transaction.getMeta('pointer')) b.onNavigate?.(pmToSource(b, editor.state.selection.head, editor.state.selection.head).from, 'visual'); } }
     });
     bridge.current.editor = editor; loadRich(bridge.current); bridge.current.onTableContext?.(editor.isActive('table'));
     return () => { bridge.current.editor = null; editor.destroy(); };

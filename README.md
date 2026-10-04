@@ -2,16 +2,18 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.4.0.
+A Markdown editor with visual editing, a code view, and document comments. Version 1.5.0.
 
 ## Features
 
-- English by default. Empty startup with Open document, Continue where you left off, and a welcome document in the interface language.
+- English by default. Empty startup with Open document, New document, and Continue where you left off. A link below opens the welcome document in the interface language.
 - Configurable bracket auto-closing in Code, independent fullscreen and caret-centered Focus mode, and zoom in both editors.
 
 - Visual and Markdown code editors, with a split view that supports editing in both panes and keeps content synchronized.
 - Multiple documents in tabs, a resizable document outline, and contextual table tools.
-- Standard Markdown (`.md`) and commented Markdown (`.trmd`) files.
+- Standard Markdown (`.md`) and commented Markdown (`.trmd`) files. Adding the first comment converts a Markdown document in memory; choose when to save it.
+- Resize images from corners or sides in Visual and editable Split, with proportional sizing, undo and Reset size. Saved dimensions use HTML image attributes inside Markdown.
+- External images are enabled by default for new preferences; saved choices are respected.
 - Printing and PDF output through the browser's print dialog.
 - Local document editing without an account or a document server.
 

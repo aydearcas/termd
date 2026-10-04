@@ -1,22 +1,26 @@
-# Termd 1.4.0
+# Termd 1.5.0
 
-## Novedades de Termd 1.4.0
+## Novedades de Termd 1.5.0
 
-- Inicio vacío: Abrir documento, Continúa donde lo dejaste y Documento de bienvenida. No aparece recuperación ni bienvenida de forma automática.
-- La bienvenida se abre en el idioma de la interfaz. Los borradores anteriores permanecen disponibles en la recuperación local.
-- Cierre automático de (), [] y {} en Código y Dividido, activado por defecto y configurable en General. No se cambia la escritura de asteriscos.
-- Disposición aparece a la izquierda de Vista. Pantalla completa amplía el editor y se abandona con Esc o su botón de salida.
-- Concentración mantiene la línea del cursor centrada en Visual, Código y Dividido. Está desactivada inicialmente. Puedes desplazarte manualmente; el seguimiento se retoma al escribir o mover el cursor. En Lectura no se activa.
-- El zoom cambia ambos editores: con un zoom del 120 %, Visual se muestra al 120 % y Código al 110 %.
-- Estadísticas del documento incluye una descripción al pasar el ratón y una explicación más clara del conteo de palabras.
+- Inicio vacío con **Abrir documento**, **Nuevo documento** en el centro y **Continúa donde lo dejaste** a la derecha. Nuevo documento permite elegir Markdown (.md) o Markdown comentado (.trmd).
+- Debajo aparece «O si es tu primera vez quizás quieras empezar con un Documento de Bienvenida», con un enlace que abre la bienvenida en el idioma de la interfaz. No se abre automáticamente.
+- Al añadir el primer comentario a un .md, **Convertir a .trmd** cambia el formato dentro de Termd sin pedir carpeta ni escribir archivos. La pestaña queda pendiente de guardar; usa Guardar cuando quieras conservar el .trmd. El Markdown original no se sobrescribe.
+- Selecciona una imagen en Visual o Dividido editable para arrastrar sus esquinas o lados. Se mantienen las proporciones; el tamaño se limita al área disponible. Cada arrastre se deshace en un paso y Esc cancela el arrastre actual. Los controles admiten flechas del teclado y Mayús para un paso mayor.
+- **Restablecer tamaño** elimina las dimensiones personalizadas. El tamaño se conserva al guardar .md o .trmd y al exportar Markdown mediante una etiqueta HTML `img`. Termd la reabre como imagen editable; otros visores pueden ignorar las dimensiones si restringen HTML. El archivo de imagen original no cambia.
+- Las imágenes externas están activadas por defecto para configuraciones nuevas. Se mantienen las preferencias existentes y puedes desactivarlas en Configuración. El navegador contacta con los servidores de esas imágenes. Las imágenes externas siguen siendo enlaces; .trmd incluye los archivos de las imágenes locales.
+- Se conservan las funciones de 1.4: cierre automático de (), [] y {} configurable en General (sin cambios en asteriscos), Concentración, Pantalla completa, zoom en ambos editores y Estadísticas del documento.
 
 Para actualizar primero develop y publicar después en main, conservando ambas ramas, consulta **ACTUALIZAR_GITHUB.md**.
 
-### Version 1.4.0 — English
+### Version 1.5.0 — English
 
-Start with an empty workspace and choose Open document, Continue where you left off, or Welcome document. The welcome opens in your interface language; drafts remain available on request. Use + to create Markdown or commented Markdown.
+The empty workspace offers **Open document**, **New document** in the middle and **Continue where you left off** on the right. New document lets you choose .md or .trmd. A sentence below links to the welcome document in your interface language.
 
-Code automatically closes parentheses, square brackets and braces by default. Disable this in Settings → General if preferred. Asterisk typing remains unchanged. Layout now comes before View. Fullscreen and Focus mode are independent; Focus mode keeps the caret line centered in either editor and resumes after manual scrolling when you type or move the caret. Zoom also scales Code at half the variation of Visual relative to 100%. Document statistics has updated labels and help text.
+The first comment on Markdown offers **Convert to .trmd** without opening a folder picker or writing a file. The tab becomes unsaved; save whenever you want. The original Markdown file stays untouched.
+
+Select an image in Visual or editable Split to resize it from corners or sides, keeping its proportions. Undo reverses a whole drag; Escape cancels it. Handles support keyboard arrows, with Shift for a larger step. **Reset size** removes custom dimensions. Size persists in .md, .trmd and Markdown exports using an HTML image tag. Termd reopens it as an editable image; other viewers may ignore dimensions when HTML is restricted. Resizing does not modify image bytes.
+
+External images are enabled by default for new preferences; existing choices remain in effect. You can disable them in Settings. Loading external images contacts their servers. External images remain links; .trmd embeds local images. Bracket closing, independent fullscreen and caret-centered Focus mode, code zoom and document statistics remain available.
 
 ## Novedades de Termd 1.3.1
 
@@ -24,7 +28,7 @@ Code automatically closes parentheses, square brackets and braces by default. Di
 - Guardar y Guardar como mantienen el formato. Guardar como .trmd convierte el documento activo; Guardar .md desde .trmd crea una copia sin comentarios.
 - .trmd reúne texto, comentarios, respuestas, estados, anclajes e imágenes locales. No se abren paquetes ZIP antiguos ni JSON auxiliares.
 - Icono distinto en las pestañas de .trmd: folio redondeado sin pliegue con el símbolo de Termd, conservando la identidad visual.
-- Antes de comentar un .md se pide guardarlo como .trmd. Cancelar mantiene el documento original y no crea el comentario.
+- El primer comentario en un .md propone convertirlo a .trmd sin guardar inmediatamente. Cancelar la conversión mantiene el documento original y no crea el comentario.
 - Ctrl/⌘+S y Guardar y cerrar conservan comentarios o respuestas en redacción dentro de .trmd.
 
 
@@ -110,13 +114,13 @@ Si el puerto está ocupado por Termd, el lanzador reutiliza la aplicación. Si l
 - Desde `.md`, **Guardar como .trmd…** guarda y convierte el documento activo; el Markdown original permanece en disco.
 - Desde `.trmd`, **Guardar .md…** guarda una copia de texto sin comentarios y mantiene abierto el .trmd. Las imágenes locales quedan referenciadas por su ruta y no se incrustan en el .md. Esta copia no marca los cambios del .trmd como guardados.
 - **Archivo → Nuevo** y el botón **+** ofrecen **Markdown (.md)** y **Markdown comentado (.trmd)**. Ctrl/⌘+N crea Markdown.
-- Antes de crear un comentario en un `.md`, Termd pide guardarlo como `.trmd`. Cancelar el diálogo o el selector de archivos conserva el formato y no crea el comentario.
+- Antes del primer comentario en un `.md`, Termd pide convertirlo a `.trmd` dentro del editor sin guardarlo inmediatamente. Cancelar la conversión mantiene el formato original. Después puedes guardar cuando quieras; cancelar el selector de guardado conserva el trabajo pendiente.
 - `.trmd` conserva texto, hilos, respuestas, estados, anclajes e imágenes locales en un único archivo. El formato no cambia al eliminar el último comentario.
 
 
 Guardar un .trmd conserva el conjunto completo. Una copia .md incluye solo el texto: no sustituye el guardado del documento nativo. La recuperación del navegador tampoco sustituye el archivo guardado.
 
-Los borradores se recuperan en el navegador mediante IndexedDB. Al volver a abrir la aplicación se ofrece restaurarlos. No se escribe automáticamente sobre tus archivos originales. Mantén el mismo navegador, perfil y dirección local; borrar los datos del navegador elimina estas copias. El archivo .trmd conserva el trabajo independientemente de la recuperación.
+Los borradores se recuperan en el navegador mediante IndexedDB. Usa Continúa donde lo dejaste en la pantalla inicial para restaurarlos. No se escribe automáticamente sobre tus archivos originales. Mantén el mismo navegador, perfil y dirección local; borrar los datos del navegador elimina estas copias. El archivo .trmd conserva el trabajo independientemente de la recuperación.
 
 ## Atajos
 
@@ -138,11 +142,11 @@ Los borradores se recuperan en el navegador mediante IndexedDB. Al volver a abri
 
 La edición visual cubre prosa, títulos, énfasis, enlaces directos, listas, tareas, citas, tablas simples GFM, código e imágenes. Markdown sigue siendo la fuente del documento: cambiar de vista no lo serializa de nuevo. Una edición visual serializa los bloques afectados y conserva los bloques intactos.
 
-El HTML, front matter, definiciones/enlaces por referencia, notas al pie, Mermaid y otras extensiones no compatibles se muestran como **bloques avanzados** y se editan en Código. Se conservan; el HTML del archivo no se ejecuta. Las listas que mezclan tareas y viñetas también se protegen. No hay celdas combinadas ni formatos de Word que Markdown no puede conservar.
+El HTML no compatible (salvo imágenes con atributos admitidos), front matter, definiciones/enlaces por referencia, notas al pie, Mermaid y otras extensiones no compatibles se muestran como **bloques avanzados** y se editan en Código. Se conservan; el HTML del archivo no se ejecuta. Las listas que mezclan tareas y viñetas también se protegen. No hay celdas combinadas ni formatos de Word que Markdown no puede conservar.
 
 Los comentarios mantienen rangos, citas y contexto. Se desplazan al editar, y Deshacer restaura conjuntamente texto y anclajes. Si se borra el fragmento o una reapertura produce coincidencias ambiguas, se marca el hilo para revisión; puedes volver a vincularlo a una selección. No se garantiza anclaje perfecto tras una reescritura externa arbitraria.
 
-Las imágenes remotas están bloqueadas inicialmente. Puedes habilitarlas en Configuración. Las imágenes locales deben seleccionarse o importarse; la aplicación no accede por su cuenta a otras rutas del disco. Si dos recursos externos tienen el mismo nombre de archivo, usa rutas únicas para evitar una asociación por nombre ambigua.
+Las imágenes externas están activadas inicialmente en configuraciones nuevas; los ajustes existentes se conservan. Puedes desactivarlas en Configuración. Las imágenes locales deben seleccionarse o importarse; la aplicación no accede por su cuenta a otras rutas del disco. Si dos recursos externos tienen el mismo nombre de archivo, usa rutas únicas para evitar una asociación por nombre ambigua.
 
 Esta versión no incluye acceso a carpetas completas, autoguardado sobre el archivo original, seguimiento de cambios formal, ecuaciones renderizadas, Mermaid renderizado ni exportación DOCX. No convierte codificaciones antiguas: si se rechaza un archivo, conviértelo explícitamente a UTF-8 antes de abrirlo.
 

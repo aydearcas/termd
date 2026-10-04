@@ -103,11 +103,12 @@ export default function DocumentEditor({ session, settings, setSettings, registe
   bridge.current.onNotice = toast; bridge.current.onCode = () => switchMode('code'); bridge.current.onComment = id => selectComment(id);
   bridge.current.onSelection = setSelectionSafe; bridge.current.onTableContext = setTableContext;
   bridge.current.onFocus = origin => { if (!applyGuard.current) { surfaceRef.current = origin; setSurface(origin); } };
-  bridge.current.onChange = (source, origin) => {
+  bridge.current.onChange = (source, origin, group = true) => {
     if (applyGuard.current) return;
     if (origin === 'visual') {
       const b = bridge.current; const result = reconcileVisual(b.editor!.getJSON(), b.blocks, b.source);
-      b.blocks = result.blocks; applySource(result.source, 'visual', true);
+      b.blocks = result.blocks; applySource(result.source, 'visual', group);
+      if (!group) history.current.time = 0;
       // Stamp newly inserted and split blocks so unchanged blocks keep their exact text.
       const tr = b.editor!.state.tr; let i = 0;
       b.editor!.state.doc.forEach((n, pos) => { const id = b.blocks[i++]?.id; if (id && n.attrs.mdId !== id) tr.setNodeMarkup(pos, undefined, { ...n.attrs, mdId: id }); });
@@ -255,6 +256,15 @@ export default function DocumentEditor({ session, settings, setSettings, registe
   }
   function beginComment(anchor: ReturnType<typeof anchorFor>) {
     setPendingAnchor(anchor); setShowComments(true); setEditId(null); setCommentDraft(''); setTimeout(() => root.current?.querySelector<HTMLElement>('#new-comment-text')?.focus(), 50);
+  }
+  function convertForComment() {
+    const anchor = commentIntent.current;
+    // The original Markdown handle must never become the TRMD save destination.
+    fileHandle.current = null; baseline.current = '';
+    const current = docRef.current;
+    commit({ ...current, format: 'trmd', fileName: documentName(current.fileName, 'trmd') }, 'convert');
+    commentIntent.current = null; setModal(null);
+    if (anchor) beginComment(anchor);
   }
   function saveComment() {
     if (!commentDraft.trim() || !pendingAnchor) return; const now = new Date().toISOString(); const c: Comment = { id: uid(), body: commentDraft.trim(), authorLabel: settings.author || t('anonymous'), createdAt: now, updatedAt: now, status: 'open', anchor: pendingAnchor, replies: [] };
@@ -483,7 +493,7 @@ export default function DocumentEditor({ session, settings, setSettings, registe
       {modal === 'help' && <HelpPanel lang={settings.lang}/>}
       {['restore', 'recent'].includes(modal) && <><p className="muted">{t('restoreHelp')}</p><div className="recent-list">{recent.map(d => <button key={d.id} onClick={() => void restore(d)}><DocumentIcon format={documentFormat(d.doc)} size={23}/><span><strong>{d.doc.fileName}</strong><small>{dateLabel(d.date, settings.lang)} · {d.doc.comments.length} {t('comments')}</small></span><CornerDownRight size={17}/></button>)}{!recent.length && <p>{t('noDrafts')}</p>}</div><div className="modal-actions"><button className="outline-button" onClick={() => setModal(null)}>{t(modal === 'restore' ? 'startFresh' : 'close')}</button></div></>}
 
-      {modal === 'commentFormat' && <><p>{t('commentFormatHelp')}</p><div className="modal-actions wrap-actions"><button autoFocus className="outline-button" disabled={fileSaving} onClick={() => { commentIntent.current = null; setModal(null); }}>{t('cancel')}</button><button className="primary-button" disabled={fileSaving} onClick={async () => { const anchor = commentIntent.current; if (await save(true, 'trmd')) { setModal(null); commentIntent.current = null; if (anchor) { beginComment(reattach([{ id: 'intent', anchor } as Comment], docRef.current.source, true)[0].anchor); } } }}>{t('saveAsTRMD')}</button></div></>}
+      {modal === 'commentFormat' && <><p>{t('commentFormatHelp')}</p><div className="modal-actions wrap-actions"><button autoFocus className="outline-button" disabled={fileSaving} onClick={() => { commentIntent.current = null; setModal(null); }}>{t('cancel')}</button><button className="primary-button" disabled={fileSaving} onClick={convertForComment}>{t('convertTRMD')}</button></div></>}
       {modal === 'conflict' && <><p>{t('conflictHelp')}</p><div className="modal-actions wrap-actions"><button className="outline-button" disabled={!external} onClick={() => setModal('external')}>{t('conflictCode')}</button><button className="outline-button" disabled={!external} onClick={() => { if (external) { fileHandle.current = external.input.handle; baseline.current = external.input.baseline || ''; resetDoc(external.input.doc, external.input.resources || resources.current); setModal(null); } }}>{t('reload')}</button><button className="primary-button" onClick={() => { setModal(null); void save(true); }}>{t('saveAs')}</button></div></>}
       {modal === 'external' && <><textarea className="external-source" readOnly value={external?.input.doc.source || ''}/><div className="modal-actions"><button className="outline-button" onClick={() => setModal('conflict')}>{t('close')}</button></div></>}
     </div></div>}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
-import { FilePlus2, FolderOpen, Clock, X, FileText, CornerDownRight, Info } from 'lucide-react';
+import { FolderOpen, Clock, X, FileText, CornerDownRight, Info } from 'lucide-react';
 import type { Settings, DocumentFormat } from './core';
 import type { SessionInput } from './workspace-types';
 import { DocumentIcon } from './DocumentIcon';
@@ -11,6 +11,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { HelpPanel } from './HelpPanel';
 import { fresh } from './App';
 import { welcomeFor } from './welcome';
+import { NewDocumentMenu } from './NewDocumentMenu';
 import { es, en, type TranslationKey } from './i18n';
 export type EmptyModal = 'settings' | 'help' | 'recent' | null;
 export function EmptyWorkspace({ create, add, settings, setSettings, modal, setModal }: { create: (format?: DocumentFormat) => void; add: (input: SessionInput) => void; settings: Settings; setSettings: React.Dispatch<React.SetStateAction<Settings>>; modal: EmptyModal; setModal: (modal: EmptyModal) => void }) {
@@ -32,11 +33,11 @@ export function EmptyWorkspace({ create, add, settings, setSettings, modal, setM
     <div className="empty-workspace-content"><div className="empty-workspace-icon"><FileText size={30} strokeWidth={1.2}/></div>
       <h1>{settings.lang === 'es' ? 'No hay ningún documento activo' : 'No active document'}</h1>
       <div className="startup-actions">
-        <button className="outline-button" onClick={() => void openPicker()}><FolderOpen size={20}/><span>{settings.lang === 'es' ? 'Abrir documento' : 'Open document'}</span></button>
-        <button className="outline-button" onClick={() => setModal('recent')}><Clock size={20}/><span>{settings.lang === 'es' ? 'Continúa donde lo dejaste' : 'Continue where you left off'}</span></button>
-        <button className="outline-button" onClick={() => add({ doc: fresh(welcomeFor(settings.lang), settings.lang === 'es' ? 'Bienvenida.md' : 'Welcome.md'), welcome: true })}><FileText size={20}/><span>{t('welcomeDocument')}</span></button>
+        <button className="outline-button startup-action" onClick={() => void openPicker()}><FolderOpen size={20}/><span>{settings.lang === 'es' ? 'Abrir documento' : 'Open document'}</span></button>
+        <NewDocumentMenu create={create} lang={settings.lang} startup/>
+        <button className="outline-button startup-action" onClick={() => setModal('recent')}><Clock size={20}/><span>{settings.lang === 'es' ? 'Continúa donde lo dejaste' : 'Continue where you left off'}</span></button>
       </div>
-      <p className="startup-hint">{settings.lang === 'es' ? 'Utiliza + en la barra superior para crear un documento Markdown o Markdown comentado.' : 'Use + in the top bar to create a Markdown or commented Markdown document.'}</p>
+      <p className="startup-hint">{settings.lang === 'es' ? 'O si es tu primera vez quizás quieras empezar con un ' : 'Or if this is your first time, you might want to start with a '}<a href="#welcome" onClick={e => { e.preventDefault(); add({ doc: fresh(welcomeFor(settings.lang), settings.lang === 'es' ? 'Bienvenida.md' : 'Welcome.md'), welcome: true }); }}>{settings.lang === 'es' ? 'Documento de Bienvenida' : 'Welcome document'}</a></p>
     </div>
     <input ref={input} type="file" accept=".md,.markdown,.txt,.trmd" multiple hidden onChange={e => { const files = Array.from(e.target.files || []); e.target.value = ''; void openFiles(files); }}/>
     {modal && <div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setModal(null); }}><div className={`modal ${modal === 'settings' ? 'settings-modal' : modal === 'help' ? 'help-modal' : ''}`} role="dialog" aria-modal="true" aria-labelledby="empty-modal-title" onKeyDown={e => { if (e.key === 'Escape') setModal(null); if (e.key !== 'Tab') return; const items = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]')], first = items[0], last = items.at(-1); if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); } }}><div className="modal-heading"><h2 id="empty-modal-title">{t(modal === 'recent' ? 'restoreTitle' : modal)}</h2><button ref={headingClose} className="tool-button compact" aria-label={t('close')} onClick={() => setModal(null)}><X size={17}/></button></div>
