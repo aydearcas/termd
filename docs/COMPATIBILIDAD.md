@@ -1,4 +1,4 @@
-# Perfil Markdown de Termd 1.3
+# Perfil Markdown de Termd 1.5
 
 | Construcción | Visual | Lectura | Conservación al abrir y cambiar de vista |
 |---|---|---|---|
@@ -10,8 +10,8 @@
 | Mezcla de tareas y viñetas en una lista | Bloque protegido | Original visible | Texto exacto |
 | Citas y código cercado | Editable | Renderizada | Texto exacto |
 | Tablas GFM | Editable; sin combinar celdas | Renderizada | Texto exacto |
-| Imágenes | Nodo con imagen o marcador | Imagen o marcador | Destino original conservado |
-| HTML | Protegido | Texto literal, sin ejecución | Texto exacto |
+| Imágenes Markdown y HTML img con src/alt/title/width/height admitidos | Imagen editable y redimensionable; marcador si no se permite o falta el recurso | Imagen con sus dimensiones; sin controles | Fuente exacta hasta editar; dimensiones en HTML img tras redimensionar |
+| Otro HTML | Protegido | Texto literal, sin ejecución | Texto exacto |
 | Front matter YAML inicial | Protegido | Texto literal | Texto exacto |
 | Referencias y definiciones compartidas | Protegido | Original visible | Texto exacto |
 | Notas al pie, Mermaid, extensiones no reconocidas | Protegido cuando el parser las identifica | Original visible | Texto exacto |
@@ -23,3 +23,5 @@ La búsqueda en texto visible trabaja por fragmentos de texto del árbol Markdow
 El esquema de comentarios usa versión 1, posiciones UTF-16, SHA-256, texto plano, rangos y contexto. Los hilos son independientes del Markdown. La matriz de interfaces y pruebas está en `VERIFICACION.md`.
 
 Los formatos de documento admitidos son Markdown UTF-8 (.md, .markdown, .txt) y el formato nativo .trmd versión 1. No se abren paquetes ZIP ni JSON auxiliares de comentarios. Véase `TRMD.md`.
+
+Las dimensiones personalizadas se conservan en .md, .trmd y exportaciones Markdown mediante atributos HTML img; los visores que restringen HTML pueden ignorarlas. Las imágenes externas están activadas por defecto en preferencias nuevas; se respetan los ajustes guardados.

@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import { diffChars } from 'diff';
+import { imageDimension, parseImageHTML } from './image-format.ts';
 
 export type Mode = 'visual' | 'code' | 'split' | 'read';
 export interface Anchor { from: number; to: number; quote: string; originalQuote?: string; prefix: string; suffix: string; state: 'attached' | 'orphan' | 'review'; }
@@ -12,10 +13,25 @@ export type DocumentFormat = 'md' | 'trmd';
 export interface DocState { documentId: string; fileName: string; format?: DocumentFormat; source: string; comments: Comment[]; bom: boolean; }
 export interface Block { id: string; start: number; end: number; raw: string; gap: string; ast: any; protected: boolean; initialJSON?: string; }
 export interface Settings { lang: 'es' | 'en'; author: string; fontSize: number; lineHeight: number; width: number; serif: boolean; bubble: boolean; remoteImages: boolean; recovery: boolean; lineNumbers: boolean; wrap: boolean; initialMode: Mode; splitMode: 'preview' | 'editable'; outlineScale: number; autoClose: boolean; }
-export const defaultSettings: Settings = { lang: 'en', author: '', fontSize: 17, lineHeight: 1.65, width: 810, serif: false, bubble: true, remoteImages: false, recovery: true, lineNumbers: true, wrap: true, initialMode: 'visual', splitMode: 'editable', outlineScale: 1, autoClose: true };
+export const defaultSettings: Settings = { lang: 'en', author: '', fontSize: 17, lineHeight: 1.65, width: 810, serif: false, bubble: true, remoteImages: true, recovery: true, lineNumbers: true, wrap: true, initialMode: 'visual', splitMode: 'editable', outlineScale: 1, autoClose: true };
 const parser = unified().use(remarkParse).use(remarkGfm);
 const renderer = unified().use(remarkRehype).use(rehypeStringify);
-export const parse = (source: string): any => parser.parse(source);
+export const parse = (source: string): any => {
+  const tree: any = parser.parse(source);
+  const visit = (node: any, parentType = ''): any => {
+    if (node.type === 'html') {
+      const tags = [...node.value.matchAll(/<img\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi)];
+      const images = tags.map((tag: RegExpMatchArray) => parseImageHTML(tag[0]));
+      if (tags.length && !node.value.replace(/<img\b(?:[^>"']|"[^"]*"|'[^']*')*>/gi, '').trim() && images.every((image): image is NonNullable<ReturnType<typeof parseImageHTML>> => !!image && safeURL(image.src, true))) {
+        const children = images.map((image, index: number) => ({ type: 'image', url: image.src, alt: image.alt, title: image.title, data: { hProperties: { ...(image.width ? { width: image.width } : {}), ...(image.height ? { height: image.height } : {}) } }, position: { start: { offset: node.position.start.offset + tags[index].index }, end: { offset: node.position.start.offset + tags[index].index + tags[index][0].length } } }));
+        return ['root', 'blockquote', 'listItem'].includes(parentType) ? { type: 'paragraph', children, position: node.position } : children[0];
+      }
+    }
+    if (node.children) node.children = node.children.map((child: any) => visit(child, node.type));
+    return node;
+  };
+  return visit(tree);
+};
 export const uid = () => crypto.randomUUID();
 const supported = new Set(['root', 'paragraph', 'heading', 'text', 'strong', 'emphasis', 'delete', 'inlineCode', 'link', 'image', 'break', 'thematicBreak', 'blockquote', 'list', 'listItem', 'code', 'table', 'tableRow', 'tableCell']);
 function isSupported(n: any): boolean {
@@ -56,7 +72,11 @@ const inline = (nodes: any[] = []): string => nodes.map(n => {
     return s;
   }
   if (n.type === 'hardBreak') return '\\\n';
-  if (n.type === 'image') return '![' + escapeText(n.attrs.alt || '') + '](' + n.attrs.src.replace(/[\s()]/g, (c: string) => encodeURIComponent(c)) + ')';
+  if (n.type === 'image') {
+    const width = imageDimension(n.attrs.width), height = imageDimension(n.attrs.height);
+    if (width || height) return '<img src="' + escapeHTML(n.attrs.src) + '" alt="' + escapeHTML(n.attrs.alt || '') + '"' + (n.attrs.title ? ' title="' + escapeHTML(n.attrs.title) + '"' : '') + (width ? ' width="' + width + '"' : '') + (height ? ' height="' + height + '"' : '') + '>';
+    return '![' + escapeText(n.attrs.alt || '') + '](' + n.attrs.src.replace(/[\s()]/g, (c: string) => encodeURIComponent(c)) + (n.attrs.title ? ' "' + n.attrs.title.replace(/"/g, '\\"') + '"' : '') + ')';
+  }
   return '';
 }).join('');
 export function serializeNode(n: any): string {

@@ -1,3 +1,26 @@
+# Verificación de Termd 1.5.0 — 4 de octubre de 2026
+
+Esta actualización pasó **187 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía y recuperación, 15 de imágenes, 15 de vista dividida, 16 de cinta de tabla, 12 de índice, 24 de interfaz y comentarios, y 9 de distribución y recursos. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html`.
+
+## Cambios comprobados
+
+- Inicio con Abrir documento, Nuevo documento y Continúa donde lo dejaste. Nuevo ofrece .md y .trmd, con navegación por teclado. La bienvenida abre desde el enlace inferior en el idioma de la interfaz. El inicio móvil de 390 px no desborda horizontalmente.
+- Conversión al primer comentario sin abrir el selector de guardado ni escribir archivos. El .md original permanece intacto y la pestaña .trmd queda pendiente de guardar.
+- Guardado posterior con destino propio .trmd. Cancelar o fallar el guardado conserva contenido y comentarios pendientes; guardar y cerrar incluye los comentarios en redacción. Sigue rechazándose la apertura de ZIP antiguos.
+- Imágenes externas activadas en preferencias nuevas, y preferencia explícita de bloqueo respetada tras recargar.
+- Ocho controles de tamaño en imágenes visuales, con proporciones, límites mínimo/máximo, ajuste por teclado, cancelación con Esc, vista previa sin modificar el código durante el arrastre y una operación de Deshacer por arrastre.
+- Restablecer tamaño vuelve a la sintaxis Markdown; se mantienen atributos de título, texto alternativo, BOM, CRLF y bloques ajenos al cambio.
+- Tamaño persistente al guardar y reabrir .md y .trmd y al exportar .md, usando atributos HTML img. Los recursos locales conservan sus bytes. Lectura muestra las dimensiones sin herramientas de edición.
+- Redimensionado bajo zoom visual al 120 % guarda dimensiones independientes del zoom y admite Deshacer.
+- HTML ejecutable y atributos de imagen no admitidos permanecen protegidos. La excepción de imágenes no habilita HTML arbitrario.
+- Regresión de comentarios, anclajes, deshacer, pestañas, scroll independiente, sincronización de vistas, tabla contextual, índice redimensionable, cierre de símbolos, Concentración y Pantalla completa.
+
+También se comprobó la web compilada bajo `/termd/`, la pantalla móvil, Fullscreen y el HTML independiente abierto desde `file://`. Se inspeccionaron capturas del inicio y de los controles de imagen. No se registraron excepciones del navegador.
+
+Las pruebas se ejecutaron con Chromium 153. Los adaptadores de archivos simulan selectores y escrituras; no se han probado los diálogos del sistema operativo en el ordenador del usuario. Otros visores de Markdown pueden ignorar dimensiones si restringen HTML. Mostrar imágenes externas contacta con sus servidores; las referencias externas no se convierten automáticamente en recursos locales del .trmd.
+
+## Registro de versiones anteriores
+
 # Verificación de Termd 1.4.0 — 4 de octubre de 2026
 
 La actualización pasó **134 comprobaciones automatizadas**: 16 del núcleo, 21 del nuevo flujo de edición, 19 de pestañas, 24 de formatos y guardado, 11 de pantalla vacía y recuperación, 15 de vista dividida, 16 de cinta contextual de tabla y 12 de índice redimensionable. TypeScript y la compilación de producción se completaron correctamente; se regeneró el HTML independiente.

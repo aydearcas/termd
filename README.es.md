@@ -2,16 +2,18 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.4.0.
+Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.0.
 
 ## Funciones
 
-- Inglés por defecto. Inicio vacío con Abrir documento, Continúa donde lo dejaste y bienvenida en el idioma de la interfaz.
+- Inglés por defecto. Inicio vacío con Abrir documento, Nuevo documento y Continúa donde lo dejaste. Un enlace inferior abre la bienvenida en el idioma de la interfaz.
 - Cierre de símbolos configurable en Código, Pantalla completa y Concentración independientes, y zoom en ambos editores.
 
 - Edición visual y de código; vista dividida con ambas vistas editables y sincronizadas.
 - Varios documentos en pestañas, índice redimensionable y herramientas de tablas.
-- Archivos Markdown `.md` y Markdown comentado `.trmd`.
+- Archivos Markdown `.md` y Markdown comentado `.trmd`. El primer comentario convierte el documento en memoria; tú decides cuándo guardarlo.
+- Imágenes redimensionables desde las esquinas o los lados en Visual y Dividido editable, manteniendo las proporciones y con Deshacer y Restablecer tamaño. Las dimensiones se guardan como atributos HTML dentro del Markdown.
+- Imágenes externas activadas por defecto para preferencias nuevas; se respetan los ajustes guardados.
 - Impresión y guardado como PDF mediante el navegador.
 - Trabajo local, sin cuenta de usuario ni servidor de documentos.
 

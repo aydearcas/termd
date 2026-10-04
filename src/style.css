@@ -40,11 +40,16 @@
 
 /* Startup choices use the existing neutral palette. */
 .startup-actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-.startup-actions>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:205px;min-height:116px;background:#fff;border-color:#dce3ed;color:#526b90;border-radius:10px;font-size:13px}
-.startup-actions>button:hover{background:#eef3fb;border-color:#b7c8e4;color:#2457c5}
+.startup-actions .startup-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:205px;min-height:116px;background:#fff;border-color:#dce3ed;color:#526b90;border-radius:10px;font-size:13px}
+.startup-actions .startup-action:hover{background:#eef3fb;border-color:#b7c8e4;color:#2457c5}
 .startup-hint{max-width:590px;margin:22px auto 0;font-size:12px;line-height:1.7;color:#8190a5}
 .app:fullscreen{height:100%;width:100%;background:#f4f6f8}
 .typewriter-mode .cm-content{padding-top:max(28px,var(--code-focus-space,28px))!important;padding-bottom:max(140px,var(--code-focus-space,140px))!important}
 .typewriter-mode .document-surface{padding-top:max(calc(49px*var(--zoom)),var(--visual-focus-space,0px));padding-bottom:max(calc(90px*var(--zoom)),var(--visual-focus-space,0px))}
-@media(max-width:740px){.empty-workspace-content{padding:24px 16px;max-height:100%;overflow:auto}.startup-actions{gap:10px}.startup-actions>button{width:100%;min-height:65px;flex-direction:row;gap:12px}.startup-hint{max-width:320px}}
+@media(max-width:740px){.empty-workspace-content{padding:24px 16px;max-height:100%;overflow:auto}.startup-actions{gap:10px}.startup-actions .startup-action{width:100%;min-height:65px;flex-direction:row;gap:12px}.startup-hint{max-width:320px}}
 @media print{.typewriter-mode .document-surface{padding:0}.exit-fullscreen{display:none}}
+
+.startup-hint a{color:#476491;text-decoration:underline;text-underline-offset:3px}.startup-hint a:hover{color:#2457c5}.startup-create{max-width:100%}@media(max-width:740px){.startup-create{width:100%}}
+
+/* Resizing affects presentation; commit document dimensions only when the drag ends. */
+.image-node{position:relative;line-height:0}.image-node img{display:block}.image-resize-controls{display:none;position:absolute;inset:0;pointer-events:none}.image-selected .image-resize-controls{display:block}.image-selected{outline:1px solid #7698d7}.image-resize-handle{position:absolute;width:10px;height:10px;padding:0;border:1px solid #527aca;border-radius:2px;background:#fff;pointer-events:auto;touch-action:none;transform:translate(-50%,-50%)}.image-resize-handle:hover,.image-resize-handle:focus-visible{background:#dce9ff;outline:2px solid #a0b8e3;outline-offset:2px}.image-resize-handle[data-resize=nw]{left:0;top:0;cursor:nwse-resize}.image-resize-handle[data-resize=n]{left:50%;top:0;cursor:ns-resize}.image-resize-handle[data-resize=ne]{left:100%;top:0;cursor:nesw-resize}.image-resize-handle[data-resize=e]{left:100%;top:50%;cursor:ew-resize}.image-resize-handle[data-resize=se]{left:100%;top:100%;cursor:nwse-resize}.image-resize-handle[data-resize=s]{left:50%;top:100%;cursor:ns-resize}.image-resize-handle[data-resize=sw]{left:0;top:100%;cursor:nesw-resize}.image-resize-handle[data-resize=w]{left:0;top:50%;cursor:ew-resize}.image-reset{position:absolute;right:0;bottom:calc(100% + 8px);pointer-events:auto;white-space:nowrap;border:1px solid #cbd7ec;border-radius:5px;background:#fff;color:#476491;padding:6px 9px;font-size:11px;line-height:1.2;box-shadow:0 2px 8px #18386110}.image-reset:hover{background:#edf3ff}.image-resizing{user-select:none}.image-resizing img{pointer-events:none}@media print{.image-resize-controls{display:none!important}.image-selected{outline:none}.image-node img,.reading img{max-width:100%}}

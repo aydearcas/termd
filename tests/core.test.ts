@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { anchorFor, blocksOf, decode, encode, mapComments, reattach, serializeNode, signature, reconcileVisual, safeURL, validateComments, parse, type Comment } from '../src/core.ts';
+import { imageDimension } from '../src/image-format.ts';
 const node = (text: string, marks: any[] = []) => ({ type: 'paragraph', content: [{ type: 'text', text, marks }] });
 const comment = (source: string, quote: string): Comment => ({ id: 'c1', body: 'Review', authorLabel: 'A', createdAt: '2026-09-30T13:00:00Z', updatedAt: '2026-09-30T13:00:00Z', status: 'open', anchor: anchorFor(source, source.indexOf(quote), source.indexOf(quote) + quote.length), replies: [] });
 test('UTF-8 BOM, accents and CRLF survive an unchanged save byte for byte', () => { const bytes = new TextEncoder().encode('\uFEFF# Título\r\n\r\nÑ 😀 sin salto final'); const d = decode(bytes); assert.deepEqual(encode({ ...d, source: d.source, documentId: '1', fileName: 'x.md', comments: [] }), bytes); });
@@ -26,3 +27,26 @@ test('A partial edit keeps the comment and original quote', () => { const s = 'A
 test('Schema rejects duplicate IDs and malformed ranges', () => { const c = comment('hello', 'hello'); validateComments({ schemaVersion: 1, documentId: 'd', comments: [c] }); assert.throws(() => validateComments({ schemaVersion: 1, documentId: 'd', comments: [c, c] })); assert.throws(() => validateComments({ schemaVersion: 1, documentId: 'd', comments: [{ ...c, anchor: { from: -1, to: 2 } }] })); });
 test('Executable and disk protocols are refused', () => { for (const u of ['javascript:alert(1)', 'data:text/html,x', 'file:///etc/passwd', 'blob:http://x/1', 'vbscript:x']) assert.equal(safeURL(u), false); for (const u of ['https://example.com', '#heading', 'assets/x.png', 'mailto:a@example.com']) assert.equal(safeURL(u), true); });
 test('Mixed task and bullet lists are preserved as advanced content', () => assert.ok(blocksOf('- [ ] Task\n- Plain item')[0].protected));
+test('Resized images serialize safe dimensions and reopen as editable Markdown image nodes', () => {
+  const source = serializeNode({ type: 'paragraph', content: [{ type: 'image', attrs: { src: 'assets/a&b.png', alt: 'A "quoted" <image>', title: 'Image title', width: 420, height: 210 } }] });
+  const block = blocksOf(source)[0];
+  assert.equal(block.protected, false);
+  assert.equal(block.ast.children[0].url, 'assets/a&b.png');
+  assert.equal(block.ast.children[0].alt, 'A "quoted" <image>');
+  assert.deepEqual(block.ast.children[0].data.hProperties, { width: 420, height: 210 });
+  assert.ok(!blocksOf('Text ' + source + ' after.')[0].protected);
+  assert.ok(!blocksOf('> ' + source)[0].protected);
+  assert.ok(!blocksOf('| A |\n|---|\n| ' + source + ' |')[0].protected);
+});
+test('HTML image support does not enable executable or unsupported HTML', () => {
+  for (const html of ['<img src="https://example.com/a.png" onerror="alert(1)" width="200">', '<img src="javascript:alert(1)" width="200">', '<img src="data:image/svg+xml,x" width="200">', '<img src="x.png" width="-1">', '<img src="x.png" width="50%">', '<img src="x.png" style="width:200px">', '<img src="x.png"><script>alert(1)</script>', '<div><img src="x.png"></div>']) assert.ok(blocksOf(html).some(block => block.protected), html);
+});
+test('Multiple resized images in one paragraph survive a source round trip', () => {
+  const source = '<img src="a.png" width="200"> <img src="b.png" width="150">';
+  const block = blocksOf(source)[0]; assert.equal(block.protected, false);
+  assert.deepEqual(block.ast.children.filter((image: any) => image.type === 'image').map((image: any) => image.url), ['a.png', 'b.png']);
+});
+test('Resetting image dimensions restores standard Markdown and preserves the title', () => {
+  assert.equal(serializeNode({ type: 'image', attrs: { src: 'assets/a.png', alt: 'Image', title: 'Title', width: null, height: null } }), '![Image](assets/a.png "Title")');
+  for (const size of [-1, 0, 100001, '50%', '1px', 'NaN', Infinity]) assert.equal(imageDimension(size), null);
+});
