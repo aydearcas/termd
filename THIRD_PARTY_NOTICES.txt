@@ -1,4 +1,4 @@
-WordMD third-party license notices. Bundled runtime and development dependencies.
+Termd third-party license notices. Bundled runtime and development dependencies.
 
 
 ========================================================================

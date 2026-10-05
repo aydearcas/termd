@@ -2,79 +2,73 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.2.
+**Revisa Markdown como revisas en Word.** Termd es un editor de Markdown con interfaz de procesador de texto, vista de código y comentarios en el margen, que además exporta esos comentarios como comentarios reales de Word.
 
-## Versión 1.5.2
+**[Abrir Termd →](https://aydearcas.github.io/termd/)** · [Descargar la versión sin conexión (Termd.html)](https://aydearcas.github.io/termd/Termd.html) · [Registro de cambios](CHANGELOG.md)
 
-- Acceso rápido a Guardar, Deshacer y Rehacer antes de las pestañas.
-- Guardado sobre el archivo abierto o arrastrado cuando el navegador permite acceso directo; el primer guardado de un documento nuevo elige destino.
-- Pantalla completa mantiene toda la interfaz de Termd.
-- Archivo → Exportar separa Imprimir, Exportar PDF y Exportar DOCX. Word permite incluir comentarios, respuestas y estados.
-- Pegar capturas inserta la imagen real, conservándola al guardar: embebida en Markdown o como recurso dentro de .trmd.
-- Apoyar Termd usa el azul del logo con texto y corazón blancos y una transición al pasar el ratón.
+![Seleccionar un fragmento, comentarlo y pasar a la vista dividida](docs/img/termd-demo.gif)
 
-## Versión 1.5.1
+## Por qué Termd
 
-- En Visual, los comentarios nuevos se abren junto al fragmento seleccionado y conservan la posición del documento al abrirlos, publicarlos o guardarlos.
-- Las opciones de formato de Nuevo documento tienen el mismo aspecto neutro y se resaltan al pasar el ratón, con foco visible al navegar con el teclado.
+- **Comentarios que viajan.** Selecciona un fragmento, comenta, responde y resuelve. Los comentarios se guardan en archivos `.trmd` y se exportan a `.docx` como comentarios nativos de Word, para que puedan leerlos revisores que solo usan Word.
+- **Tu Markdown sigue siendo tuyo.** Los archivos que no editas se guardan byte a byte (con BOM y saltos de línea originales). Lo que el editor visual no maneja —front matter, HTML, Mermaid, referencias— queda protegido en lugar de reescrito.
+- **Visual, código o ambos.** Edita con una cinta de herramientas familiar, directamente en Markdown o en una vista dividida con los dos paneles editables y sincronizados.
+- **Local.** Sin cuenta ni servidor de documentos. Los archivos se abren desde tu equipo y los borradores se recuperan desde tu navegador.
+
+| Comentarios en el margen | Exportado a Word (visto en LibreOffice) |
+|---|---|
+| ![Comentario anclado a un fragmento](docs/img/termd-comentarios.png) | ![Exportación DOCX con el comentario en el margen](docs/img/termd-docx-comentarios.png) |
 
 ## Funciones
 
-- Inglés por defecto. Inicio vacío con Abrir documento, Nuevo documento y Continúa donde lo dejaste. Un enlace inferior abre la bienvenida en el idioma de la interfaz.
-- Cierre de símbolos configurable en Código, Pantalla completa y Concentración independientes, y zoom en ambos editores.
-
-- Edición visual y de código; vista dividida con ambas vistas editables y sincronizadas.
+- Edición visual y de código, y vista dividida con ambos paneles editables y sincronizados.
 - Varios documentos en pestañas, índice redimensionable y herramientas de tablas.
-- Archivos Markdown `.md` y Markdown comentado `.trmd`. El primer comentario convierte el documento en memoria; tú decides cuándo guardarlo.
-- Imágenes redimensionables desde las esquinas o los lados en Visual y Dividido editable, manteniendo las proporciones y con Deshacer y Restablecer tamaño. Las dimensiones se guardan como atributos HTML dentro del Markdown.
-- Imágenes externas activadas por defecto para preferencias nuevas; se respetan los ajustes guardados.
-- Impresión con el navegador, exportación directa a PDF paginado y DOCX editable con comentarios opcionales. Consulta [los detalles](docs/EXPORTACION.md).
-- Trabajo local, sin cuenta de usuario ni servidor de documentos.
+- Markdown (`.md`) y Markdown comentado (`.trmd`). El primer comentario convierte el documento en memoria; tú decides cuándo guardarlo.
+- Imágenes redimensionables; las capturas pegadas se conservan dentro del documento.
+- Impresión, exportación directa a PDF paginado y DOCX editable con comentarios opcionales. Consulta [los detalles](docs/EXPORTACION.md).
+- Buscar y reemplazar, modo Concentración, pantalla completa, zoom y estadísticas del documento.
+- Interfaz en español e inglés.
+
+### Formatos
+
+- **`.md`** es Markdown estándar, compatible con cualquier editor.
+- **`.trmd`** reúne Markdown, comentarios e imágenes locales en un solo archivo. Consulta [docs/TRMD.md](docs/TRMD.md). Desde un `.trmd` puedes guardar una copia `.md` sin comentarios.
 
 ## Usar Termd
 
-La web publicada permite abrir archivos de tu equipo. Los documentos no se envían a un servidor de Termd. La recuperación local se almacena en el navegador y depende del navegador y de la dirección desde la que usas la aplicación. Guarda tus archivos para conservar una copia independiente. Si habilitas contenido remoto, como imágenes externas, el navegador realiza esas peticiones.
+- **En la web:** https://aydearcas.github.io/termd/ — funciona mejor en Chrome o Edge, que permiten guardar directamente sobre el archivo abierto. Otros navegadores descargan una copia.
+- **Sin conexión:** descarga [Termd.html](https://aydearcas.github.io/termd/Termd.html) y ábrelo en tu navegador. Es autocontenido y no hace peticiones de red.
 
-También puedes descargar este repositorio y abrir `Termd.html` para utilizar la versión independiente. Consulta [LEEME.md](LEEME.md) para otras formas de uso local y [docs/TRMD.md](docs/TRMD.md) para el formato comentado.
+Termd no envía tus documentos a ningún sitio. Los borradores de recuperación se guardan en el navegador y dependen de la dirección desde la que abres Termd. Guarda tus archivos para conservar una copia independiente. Si activas las imágenes externas, el navegador las carga desde sus servidores.
 
-## Publicar gratis con GitHub Pages
-
-Sigue [GUIA_PUBLICACION.md](GUIA_PUBLICACION.md). El flujo `.github/workflows/pages.yml` publica el contenido ya compilado de `dist` al actualizar la rama `main`. No requiere instalar Node para la primera publicación.
-
-**El flujo publica `dist`; no recompila el código fuente.** Para publicar cambios en `src`, genera y sube también la nueva carpeta `dist`.
+Guía de uso completa en [LEEME.md](LEEME.md).
 
 ## Desarrollo
 
-Con una versión de Node compatible con las dependencias del proyecto, desde la carpeta del repositorio:
+Necesitas Node.js 22.13 o posterior.
 
 ```bash
 npm ci
-npm run dev
+npm run dev        # servidor de desarrollo
+npm test           # pruebas del núcleo
+npm run build      # compila en dist/
+node scripts/package.cjs   # genera Termd.html a partir de dist/
+npm run format     # formatea con Prettier
 ```
 
-Para comprobar y compilar cambios:
+Las suites de navegador están en `tests/*.cjs` y necesitan un Chromium indicado en `TERMD_BROWSER`. Consulta [docs/VERIFICACION.md](docs/VERIFICACION.md).
 
-```bash
-npm test
-npm run build
-```
+### Cómo se publica
 
-La compilación utiliza rutas relativas y puede alojarse en una subcarpeta como `/termd/`. Para regenerar también el HTML independiente:
+- Al subir cambios a `develop` (o abrir una pull request hacia `main`) se ejecuta **Comprobar Termd**: instala, prueba, compila y deja la versión compilada para descargarla y probarla antes de fusionar.
+- Al fusionar en `main` se ejecuta **Publicar Termd**: compila `dist/` desde cero, genera `Termd.html` y publica en GitHub Pages. Si fallan las pruebas o la compilación, no se publica nada y sigue activa la versión anterior.
 
-```bash
-node scripts/package.cjs
-```
-
-Después, sube el código actualizado, `dist` y, si lo regeneraste, `Termd.html`. Los flujos de prueba del navegador están en `tests`; consulta la verificación de la versión en [docs/VERIFICACION.md](docs/VERIFICACION.md).
+`dist/` y `Termd.html` son resultados de la compilación y no se guardan en el repositorio. Guía paso a paso: [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md).
 
 ## Licencia
 
-Termd utiliza la licencia propia **Termd Source-Available License 1.0**. Permite usarlo gratuitamente, también dentro de empresas, y redistribuirlo gratis con su código bajo las mismas condiciones. Vender o monetizar directamente Termd o sus versiones derivadas requiere permiso escrito adicional. Se permiten aportaciones voluntarias e incondicionales al proyecto original. Los documentos creados con Termd quedan fuera de esta licencia del programa.
-
-Es software de código disponible con restricciones comerciales, no open source según la definición de la OSI. Consulta [LICENSE](LICENSE), la explicación en español de [docs/LICENCIA.md](docs/LICENCIA.md) y [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Las dependencias conservan sus propias licencias.
+[MIT](LICENSE) © 2026 Aythami de Armas Castellano. Resumen en español en [docs/LICENCIA.md](docs/LICENCIA.md). Las dependencias mantienen sus propias licencias; consulta [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Los documentos que creas con Termd son tuyos.
 
 ## Apoyar Termd
 
-Termd se puede usar gratis. Si te resulta útil, puedes [apoyar su desarrollo por PayPal](https://paypal.me/aydearcas). Las aportaciones son voluntarias y no desbloquean funciones adicionales. El enlace **Apoyar Termd** está en la barra superior y abre PayPal en una pestaña nueva. Consulta [APOYAR_TERMD.md](APOYAR_TERMD.md) para las instrucciones de publicación.
-
-Para actualizar un repositorio ya publicado, consulta [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md).
+Termd es gratuito. Si te resulta útil, puedes [apoyar su desarrollo por PayPal](https://paypal.me/aydearcas). Las aportaciones son voluntarias y no desbloquean funciones.

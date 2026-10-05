@@ -4,7 +4,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
  const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5183'], { stdio: 'ignore' }); let browser;
  try {
   for (let i = 0; i < 50; i++) { try { await fetch('http://127.0.0.1:5183/'); break; } catch { await new Promise(r => setTimeout(r, 100)); } }
-  browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || path.resolve('../qa-browser/chromium') });
+  browser = await chromium.launch({ headless: true, args: packed.args, executablePath: (process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER) || path.resolve('../qa-browser/chromium') });
   const context = await browser.newContext({ viewport: { width: 1500, height: 1000 } }), page = await context.newPage(), errors = [];
   page.on('pageerror', e => errors.push(e.message));
   // Previous releases persisted preview as their automatic default.

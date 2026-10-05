@@ -11,26 +11,38 @@ export function useFullscreen(root: RefObject<HTMLDivElement | null>) {
     return () => document.removeEventListener('fullscreenchange', changed);
   }, [root]);
   useEffect(() => {
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape' && !document.fullscreenElement) setFullscreen(false); };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !document.fullscreenElement) setFullscreen(false);
+    };
     document.addEventListener('keydown', escape);
     return () => document.removeEventListener('keydown', escape);
   }, []);
   async function exitFullscreen() {
     if (document.fullscreenElement === root.current) {
-      try { await document.exitFullscreen(); } catch { /* Keep the visible exit available. */ }
+      try {
+        await document.exitFullscreen();
+      } catch {
+        /* Keep the visible exit available. */
+      }
     } else setFullscreen(false);
   }
   async function toggleFullscreen() {
     if (pending.current) return;
-    if (fullscreen || document.fullscreenElement === root.current) { await exitFullscreen(); return; }
+    if (fullscreen || document.fullscreenElement === root.current) {
+      await exitFullscreen();
+      return;
+    }
     const element = root.current;
     if (!element) return;
     pending.current = true;
     try {
       if (document.fullscreenEnabled && element.requestFullscreen) await element.requestFullscreen();
       else setFullscreen(true);
-    } catch { setFullscreen(true); /* Fall back to the expanded editor in restricted browsers. */ }
-    finally { pending.current = false; }
+    } catch {
+      setFullscreen(true); /* Fall back to the expanded editor in restricted browsers. */
+    } finally {
+      pending.current = false;
+    }
   }
   return { fullscreen, toggleFullscreen, exitFullscreen };
 }

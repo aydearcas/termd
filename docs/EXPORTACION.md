@@ -1,4 +1,4 @@
-# Exportar desde Termd 1.5.2
+# Exportar desde Termd 1.5.3
 
 **Archivo → Exportar** ofrece tres acciones independientes:
 

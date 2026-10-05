@@ -4,7 +4,7 @@ const assert = require('node:assert/strict'), path = require('node:path'), { spa
  const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5185'], { stdio: 'ignore' }); let browser;
  try {
   for (let i = 0; i < 50; i++) { try { await fetch('http://127.0.0.1:5185/'); break; } catch { await new Promise(r => setTimeout(r, 100)); } }
-  browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || path.resolve('../qa-browser/chromium') });
+  browser = await chromium.launch({ headless: true, args: packed.args, executablePath: (process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER) || path.resolve('../qa-browser/chromium') });
   const context = await browser.newContext({ viewport: { width: 1500, height: 1000 } }), page = await context.newPage(), errors = [];
   page.on('pageerror', e => errors.push(e.message)); await page.addInitScript(() => { if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({ recovery: false })); });
   await page.addInitScript(() => { window.showSaveFilePicker = undefined; });await page.addInitScript(() => { const saved = JSON.parse(localStorage.getItem('wordmd.settings') || '{}'); localStorage.setItem('wordmd.settings', JSON.stringify({...saved, lang: 'es'})); });await page.goto('http://127.0.0.1:5185/');await page.getByRole('link',{name:/^(Welcome document|Documento de Bienvenida)$/}).click();

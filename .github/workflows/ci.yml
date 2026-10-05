@@ -1,0 +1,101 @@
+name: Comprobar Termd
+
+# Se ejecuta al subir cambios a develop y en las pull requests hacia main.
+# No publica nada: compila, prueba y deja una copia descargable de la web
+# (dist + Termd.html) en el apartado "Artifacts" de la ejecución, para que
+# puedas probar la versión antes de fusionarla en main.
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener los archivos
+        uses: actions/checkout@v6
+
+      - name: Preparar Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci --no-audit --no-fund
+
+      - name: Comprobar formato (Prettier)
+        # Informativo: avisa si algún archivo no sigue el formato, sin bloquear.
+        continue-on-error: true
+        run: npx --yes prettier@3 --check "src/**/*.{ts,tsx,css}" "tests/core.test.ts"
+
+      - name: Pruebas del núcleo
+        run: npm test
+
+      - name: Compilar la web (dist limpio)
+        run: |
+          rm -rf dist
+          npm run build
+
+      - name: Generar Termd.html independiente
+        run: |
+          node scripts/package.cjs
+          cp Termd.html dist/Termd.html
+
+      - name: Guardar la versión compilada para probarla
+        uses: actions/upload-artifact@v4
+        with:
+          name: termd-compilado
+          path: dist
+          retention-days: 14
+
+  browser:
+    name: Pruebas en navegador (informativas)
+    runs-on: ubuntu-latest
+    # Estas suites no bloquean la publicación: sirven para detectar regresiones
+    # de comportamiento antes de fusionar. Revisa su resultado en la pull request.
+    continue-on-error: true
+    steps:
+      - name: Obtener los archivos
+        uses: actions/checkout@v6
+
+      - name: Preparar Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci --no-audit --no-fund
+
+      - name: Compilar y empaquetar
+        run: |
+          rm -rf dist
+          npm run build
+          node scripts/package.cjs
+
+      - name: Ejecutar las suites de navegador
+        run: |
+          export TERMD_BROWSER="$(node -e "require('@sparticuz/chromium').default.executablePath().then(p => console.log(p))")"
+          export WORDMD_BROWSER="$TERMD_BROWSER"
+          echo "Navegador: $TERMD_BROWSER"
+          mkdir -p ../outputs ../qa-browser
+          failed=""
+          for suite in editor-workflow formats workspace empty-workspace extended images comments-scroll split table-ribbon outline-resize clipboard-images distribution; do
+            echo "::group::$suite"
+            if timeout 600 node "tests/$suite.cjs"; then echo "OK $suite"; else echo "::warning::Falló la suite $suite"; failed="$failed $suite"; fi
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then echo "Suites con fallos:$failed"; exit 1; fi
