@@ -1,5 +1,10 @@
 name: Publicar Termd
 
+# Compila Termd desde el código fuente y publica la web en GitHub Pages
+# cada vez que se actualiza la rama main (por ejemplo, al fusionar develop).
+# La carpeta dist se genera aquí desde cero: no hace falta subirla al repositorio.
+# Si las pruebas o la compilación fallan, no se publica nada y la web anterior sigue activa.
+
 on:
   push:
     branches: [main]
@@ -12,29 +17,60 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
+    name: Compilar y probar
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Obtener los archivos
         uses: actions/checkout@v6
 
+      - name: Preparar Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci --no-audit --no-fund
+
+      - name: Pruebas del núcleo
+        run: npm test
+
+      - name: Compilar la web (dist limpio)
+        run: |
+          rm -rf dist
+          npm run build
+
+      - name: Generar Termd.html independiente
+        run: |
+          node scripts/package.cjs
+          cp Termd.html dist/Termd.html
+
+      - name: Comprobar el resultado
+        run: |
+          test -f dist/index.html
+          test -f dist/Termd.html
+          ls -la dist dist/assets
+
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
-
-      - name: Comprobar la web compilada
-        run: test -f dist/index.html
 
       - name: Subir la web compilada
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
-      - name: Publicar
+  deploy:
+    name: Publicar
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
