@@ -1,3 +1,44 @@
+# Verificación de Termd 1.5.2 — 5 de octubre de 2026
+
+Esta versión pasó **216 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía, 24 de interfaz y comentarios, 15 de imágenes, 9 de posición de comentarios, 15 de vista dividida, 21 nuevas de guardado/exportación, 10 nuevas de capturas pegadas, 17 de distribución compilada/independiente y 9 de recursos y servidor local. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html` con los motores de exportación incorporados.
+
+## Cambios comprobados
+
+- Barra Guardar/Deshacer/Rehacer junto al logo y antes de las pestañas, con acciones sobre el documento activo y estados deshabilitados correctos.
+- Guardar sobre el .md o .trmd abierto sin volver a elegir carpeta; Guardar como cambia el destino; los documentos nuevos eligen destino una sola vez.
+- Vínculo nativo retenido al arrastrar y al recuperar un borrador tras recargar. Denegar permiso conserva el trabajo sin cambiar automáticamente a Guardar como. Detección de cambios externos sin sobrescribirlos.
+- Pantalla completa de todo el espacio de trabajo: pestañas, barra rápida, cinta, índice y comentarios siguen disponibles. Cambiar de pestaña conserva el modo y Esc permite salir. Concentración permanece independiente.
+- Archivo → Exportar con Imprimir, PDF y DOCX separados. Imprimir usa el navegador; PDF genera un archivo real directamente; Word contiene texto editable, títulos, formatos, listas, tabla, código, enlaces e imágenes.
+- Comentarios de Word anclados, también dentro de tablas, con respuestas y estado resuelto. Los hilos sin anclaje se conservan en un apartado final; desactivar Incluir comentarios genera una copia limpia. Exportar mantiene el formato, destino y documento activo.
+- Capturas del portapapeles visibles, redimensionables y deshacibles. Su archivo de imagen tiene prioridad sobre las rutas inaccesibles del HTML del portapapeles. Guardar/reabrir .md conserva datos raster embebidos; .trmd conserva los bytes originales como recurso. Pegado en Dividido sincroniza el código y el botón Pegar admite imágenes sin texto.
+- Exportación de imágenes embebidas con imágenes externas desactivadas; SVG y datos ejecutables siguen bloqueados.
+- Botón Apoyar Termd con el azul del logo, texto/corazón blancos y cambio de color al pasar el ratón.
+- Regresión de scroll de comentarios, cierre de símbolos, zoom, Concentración, pestañas, recuperación, tamaños de imagen y conservación de BOM/CRLF.
+
+La web compilada se comprobó bajo `/termd/` y el HTML independiente desde `file://`: bienvenida/ayuda 1.5.2, capturas, PDF y DOCX con imagen embebida, pantalla completa y pantalla móvil de 390 px. Los motores se cargan al exportar; el HTML independiente no realizó solicitudes de red. Se inspeccionaron capturas de la cinta y del PDF. Un documento largo produjo 9 páginas con texto seleccionable, Unicode, imágenes y pies numerados dentro de los límites de página. Los paquetes DOCX generados tienen XML válido y estructuras de revisión comprobadas.
+
+## Entorno y límites de la verificación
+
+Se usó Chromium 153 para las suites generales y Chromium 143 para la suite de guardado nativo. El Chromium 153 empaquetado para pruebas falla al recuperar un handle OPFS desde IndexedDB incluso en una reproducción mínima ajena a Termd; Chromium 143 completó el ciclo de almacenamiento, recarga y escritura. Las pruebas usan handles reales de almacenamiento privado del navegador para simular destinos y adaptadores para los selectores. No se han probado los diálogos del sistema operativo ni la presentación en Microsoft Word en el ordenador del usuario.
+
+El guardado directo depende de File System Access; otros navegadores descargan copias. Las imágenes externas pueden estar bloqueadas para exportación por CORS aunque se vean en el editor. Las imágenes raster embebidas hacen que el Markdown pese más y otros visores pueden restringirlas. Los bloques avanzados se conservan como texto en las exportaciones; los hilos sin anclaje exportable se incluyen al final.
+
+## Ejecutar las pruebas nuevas
+
+```bash
+npm ci
+npm test
+WORDMD_BROWSER=/ruta/a/chromium node tests/save-export.cjs
+WORDMD_BROWSER=/ruta/a/chromium node tests/clipboard-images.cjs
+npm run build
+node scripts/package.cjs
+WORDMD_BROWSER=/ruta/a/chromium node tests/distribution.cjs
+```
+
+La suite `save-export.cjs` requiere un Chromium que permita recuperar handles nativos desde IndexedDB. `distribution.cjs` comprueba los archivos compilados y `Termd.html`, por lo que necesita la compilación y el empaquetado previos.
+
+## Registro de versiones anteriores
+
 # Verificación de Termd 1.5.1 — 4 de octubre de 2026
 
 Esta corrección pasó **129 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía y recuperación, 24 de interfaz y comentarios, y 9 nuevas de posición de comentarios y menú de formatos. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html`.

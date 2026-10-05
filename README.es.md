@@ -2,7 +2,16 @@
 
 [English](README.md) · Español
 
-Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.1.
+Editor de Markdown con edición visual, vista de código y comentarios. Versión 1.5.2.
+
+## Versión 1.5.2
+
+- Acceso rápido a Guardar, Deshacer y Rehacer antes de las pestañas.
+- Guardado sobre el archivo abierto o arrastrado cuando el navegador permite acceso directo; el primer guardado de un documento nuevo elige destino.
+- Pantalla completa mantiene toda la interfaz de Termd.
+- Archivo → Exportar separa Imprimir, Exportar PDF y Exportar DOCX. Word permite incluir comentarios, respuestas y estados.
+- Pegar capturas inserta la imagen real, conservándola al guardar: embebida en Markdown o como recurso dentro de .trmd.
+- Apoyar Termd usa el azul del logo con texto y corazón blancos y una transición al pasar el ratón.
 
 ## Versión 1.5.1
 
@@ -19,7 +28,7 @@ Editor de Markdown con edición visual, vista de código y comentarios. Versión
 - Archivos Markdown `.md` y Markdown comentado `.trmd`. El primer comentario convierte el documento en memoria; tú decides cuándo guardarlo.
 - Imágenes redimensionables desde las esquinas o los lados en Visual y Dividido editable, manteniendo las proporciones y con Deshacer y Restablecer tamaño. Las dimensiones se guardan como atributos HTML dentro del Markdown.
 - Imágenes externas activadas por defecto para preferencias nuevas; se respetan los ajustes guardados.
-- Impresión y guardado como PDF mediante el navegador.
+- Impresión con el navegador, exportación directa a PDF paginado y DOCX editable con comentarios opcionales. Consulta [los detalles](docs/EXPORTACION.md).
 - Trabajo local, sin cuenta de usuario ni servidor de documentos.
 
 ## Usar Termd

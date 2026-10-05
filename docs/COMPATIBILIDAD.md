@@ -1,4 +1,4 @@
-# Perfil Markdown de Termd 1.5
+# Perfil Markdown de Termd 1.5.2
 
 | Construcción | Visual | Lectura | Conservación al abrir y cambiar de vista |
 |---|---|---|---|
@@ -25,3 +25,5 @@ El esquema de comentarios usa versión 1, posiciones UTF-16, SHA-256, texto plan
 Los formatos de documento admitidos son Markdown UTF-8 (.md, .markdown, .txt) y el formato nativo .trmd versión 1. No se abren paquetes ZIP ni JSON auxiliares de comentarios. Véase `TRMD.md`.
 
 Las dimensiones personalizadas se conservan en .md, .trmd y exportaciones Markdown mediante atributos HTML img; los visores que restringen HTML pueden ignorarlas. Las imágenes externas están activadas por defecto en preferencias nuevas; se respetan los ajustes guardados.
+
+Las capturas pegadas se conservan como recursos del .trmd o como datos raster base64 en .md. Los enlaces data se admiten únicamente para formatos de imagen raster; SVG y contenido ejecutable permanecen bloqueados. Otros lectores pueden restringir imágenes embebidas. Las exportaciones PDF/DOCX se describen en `EXPORTACION.md`.

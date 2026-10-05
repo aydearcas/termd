@@ -30,3 +30,7 @@ Las imágenes sin dimensiones personalizadas mantienen la sintaxis Markdown. Las
 The first comment on Markdown offers conversion to .trmd in memory, without a save picker or a file write. The original .md handle is detached, and the converted tab is marked unsaved. Save later to choose a .trmd destination. Cancelling or failing that later save preserves pending work.
 
 Resized images store dimensions as HTML img attributes inside Markdown. Sizes persist in native files and Markdown exports; Termd reopens them as editable images. Other viewers may ignore sizing if HTML is restricted. The TRMD schema and original local image bytes stay unchanged; external images remain URL references.
+
+## Capturas y Word en 1.5.2
+
+Las capturas pegadas se guardan como recursos locales dentro de .trmd, sin modificar el formato del contenedor. En documentos .md se embeben como imágenes raster. Archivo → Exportar DOCX permite incluir los comentarios como revisión de Word o crear una copia limpia; consulta `EXPORTACION.md`.

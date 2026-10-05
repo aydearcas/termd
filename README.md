@@ -2,7 +2,16 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.5.1.
+A Markdown editor with visual editing, a code view, and document comments. Version 1.5.2.
+
+## Version 1.5.2
+
+- Quick access Save, Undo and Redo before the document tabs.
+- Save writes to the opened or dropped file when the browser supports direct file access; new documents choose a destination on first save.
+- Fullscreen keeps the whole Termd interface visible.
+- File → Export separates Print, Export PDF and Export DOCX. Word exports can include comments, replies and resolved states.
+- Pasted screenshots insert actual image data and persist when saved: embedded in Markdown or stored as a resource inside .trmd.
+- Support Termd uses the logo blue with white text and heart, plus a hover transition.
 
 ## Version 1.5.1
 
@@ -19,7 +28,7 @@ A Markdown editor with visual editing, a code view, and document comments. Versi
 - Standard Markdown (`.md`) and commented Markdown (`.trmd`) files. Adding the first comment converts a Markdown document in memory; choose when to save it.
 - Resize images from corners or sides in Visual and editable Split, with proportional sizing, undo and Reset size. Saved dimensions use HTML image attributes inside Markdown.
 - External images are enabled by default for new preferences; saved choices are respected.
-- Printing and PDF output through the browser's print dialog.
+- Printing through the browser dialog, direct paginated PDF export and editable DOCX export with optional review comments. See [export details](docs/EXPORTACION.md).
 - Local document editing without an account or a document server.
 
 ## Using Termd
