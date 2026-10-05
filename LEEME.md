@@ -1,4 +1,20 @@
-# Termd 1.5.1
+# Termd 1.5.2
+
+## Novedades de Termd 1.5.2
+
+- Guardar, Deshacer y Rehacer en la barra superior antes de las pestañas. Los botones actúan sobre el documento activo.
+- Al abrir un archivo mediante el selector o arrastrarlo, Guardar actualiza el mismo archivo cuando el navegador proporciona acceso directo. Los documentos nuevos eligen carpeta una sola vez. Guardar como permite elegir otra copia. El vínculo también se conserva en los borradores recuperados; el navegador puede pedir permiso de escritura de nuevo. Si detectamos un cambio externo no sobrescribimos el archivo automáticamente.
+- Pantalla completa mantiene la interfaz completa, incluidos menús, pestañas, índice y comentarios. Esc o el botón de salida vuelve a la ventana normal.
+- Archivo → Exportar ofrece Imprimir, Exportar PDF y Exportar DOCX como acciones separadas. PDF genera un archivo paginado sin abrir el diálogo de impresión. DOCX crea texto editable y permite incluir comentarios, respuestas y estados de revisión. Los hilos sin anclaje exportable se conservan en un apartado final. Más detalles en docs/EXPORTACION.md.
+- Pegar una captura en Visual o Dividido editable inserta sus datos reales. En .md se guarda una imagen raster embebida en el Markdown; en .trmd se guarda un recurso local en el contenedor. No necesita activar imágenes externas.
+- Apoyar Termd usa el azul del logo, corazón y texto blancos y una transición de color al pasar el ratón.
+
+### Version 1.5.2 — English
+
+Quick access Save, Undo and Redo appears before the tabs. Compatible browsers save to the opened or dropped file; new documents choose a destination once. Recovery retains the file association, but renewed browser permission may be required. External edits are detected before overwriting.
+
+Fullscreen keeps the whole interface. File → Export offers separate Print, PDF and editable Word actions. Word can include anchored comments, replies and resolved states; unanchored threads become an appendix. Pasted screenshots persist in Markdown as embedded raster images or as local resources in .trmd. The Support Termd button uses the logo blue, white heart/text and a hover transition.
+
 
 ## Novedades de Termd 1.5.1
 

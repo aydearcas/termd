@@ -59,7 +59,8 @@ export function renderAST(ast: any): string {
   return String(renderer.stringify(renderer.runSync({ type: 'root', children: [ast] })));
 }
 export const escapeHTML = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-export const safeURL = (s: string, image = false) => !/^\s*(?:javascript|vbscript|data|file|blob):/i.test(s) && (!/^\s*[a-z][\w+.-]*:/i.test(s) || (image ? /^https?:/i : /^(?:https?|mailto|tel):/i).test(s));
+export const rasterDataURL = (s: string) => s.length <= 14 * 1024 * 1024 && /^data:image\/(?:png|jpeg|gif|webp|avif);base64,[A-Za-z0-9+/]+={0,2}$/i.test(s);
+export const safeURL = (s: string, image = false) => image && rasterDataURL(s) || !/^\s*(?:javascript|vbscript|data|file|blob):/i.test(s) && (!/^\s*[a-z][\w+.-]*:/i.test(s) || (image ? /^https?:/i : /^(?:https?|mailto|tel):/i).test(s));
 export const escapeText = (s: string) => s.replace(/([\\`*_[\]<>~])/g, '\\$1').replace(/^(\s*)([#>+-]|\d+[.)])(?=\s)/gm, '$1\\$2');
 const inline = (nodes: any[] = []): string => nodes.map(n => {
   if (n.type === 'text') {

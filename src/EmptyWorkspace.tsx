@@ -5,7 +5,7 @@ import type { Settings, DocumentFormat } from './core';
 import type { SessionInput } from './workspace-types';
 import { DocumentIcon } from './DocumentIcon';
 import { documentFormat, openFileTypes } from './files';
-import { readDocument } from './opening';
+import { readDocument, droppedFiles } from './opening';
 import { drafts, clearDrafts, type Draft } from './storage';
 import { SettingsPanel } from './SettingsPanel';
 import { HelpPanel } from './HelpPanel';
@@ -29,7 +29,7 @@ export function EmptyWorkspace({ create, add, settings, setSettings, modal, setM
     } catch (e: any) { if (e.name !== 'AbortError') setNotice(t('openError')); }
     else input.current?.click();
   }
-  return <main className="empty-workspace" onDragOver={e => { if (e.dataTransfer.types.includes('Files')) e.preventDefault(); }} onDrop={e => { if (!e.dataTransfer.files.length) return; e.preventDefault(); void openFiles(Array.from(e.dataTransfer.files)); }}>
+  return <main className="empty-workspace" onDragOver={e => { if (e.dataTransfer.types.includes('Files')) e.preventDefault(); }} onDrop={e => { if (!e.dataTransfer.files.length) return; e.preventDefault(); void droppedFiles(e.dataTransfer).then(entries => openFiles(entries.map(item => item.file), entries.map(item => item.handle))).catch(() => setNotice(t('openError'))); }}>
     <div className="empty-workspace-content"><div className="empty-workspace-icon"><FileText size={30} strokeWidth={1.2}/></div>
       <h1>{settings.lang === 'es' ? 'No hay ningún documento activo' : 'No active document'}</h1>
       <div className="startup-actions">
@@ -43,7 +43,7 @@ export function EmptyWorkspace({ create, add, settings, setSettings, modal, setM
     {modal && <div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setModal(null); }}><div className={`modal ${modal === 'settings' ? 'settings-modal' : modal === 'help' ? 'help-modal' : ''}`} role="dialog" aria-modal="true" aria-labelledby="empty-modal-title" onKeyDown={e => { if (e.key === 'Escape') setModal(null); if (e.key !== 'Tab') return; const items = [...e.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input,select,textarea,a[href]')], first = items[0], last = items.at(-1); if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); } }}><div className="modal-heading"><h2 id="empty-modal-title">{t(modal === 'recent' ? 'restoreTitle' : modal)}</h2><button ref={headingClose} className="tool-button compact" aria-label={t('close')} onClick={() => setModal(null)}><X size={17}/></button></div>
       {modal === 'help' && <HelpPanel lang={settings.lang}/>}
       {modal === 'settings' && <SettingsPanel settings={settings} setSettings={setSettings} onRecent={() => setModal('recent')} onClearDrafts={() => { if (window.confirm(t('clearConfirm'))) void clearDrafts().then(() => { setRecent([]); setNotice(t('noDrafts')); }); }}/>}
-      {modal === 'recent' && <><p className="muted">{t('restoreHelp')}</p><div className="recent-list">{recent.map(d => <button key={d.id} onClick={() => add({ doc: d.doc, resources: new Map(d.resources?.map(r => [r.name, r.blob]) || []), recovered: true })}><DocumentIcon format={documentFormat(d.doc)} size={23}/><span><strong>{d.doc.fileName}</strong><small>{new Date(d.date).toLocaleString(settings.lang === 'es' ? 'es-ES' : 'en-GB')} · {d.doc.comments.length} {t('comments')}</small></span><CornerDownRight size={17}/></button>)}{!recent.length && <p>{t('noDrafts')}</p>}</div></>}
+      {modal === 'recent' && <><p className="muted">{t('restoreHelp')}</p><div className="recent-list">{recent.map(d => <button key={d.id} onClick={() => add({ doc: d.doc, resources: new Map(d.resources?.map(r => [r.name, r.blob]) || []), recovered: true, handle: d.handle, baseline: d.baseline })}><DocumentIcon format={documentFormat(d.doc)} size={23}/><span><strong>{d.doc.fileName}</strong><small>{new Date(d.date).toLocaleString(settings.lang === 'es' ? 'es-ES' : 'en-GB')} · {d.doc.comments.length} {t('comments')}</small></span><CornerDownRight size={17}/></button>)}{!recent.length && <p>{t('noDrafts')}</p>}</div></>}
     </div></div>}
     {notice && <div className="toast" role="status"><Info size={17}/><span>{notice}</span><button aria-label={t('close')} onClick={() => setNotice('')}><X size={14}/></button></div>}
   </main>;

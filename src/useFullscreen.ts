@@ -6,9 +6,15 @@ export function useFullscreen(root: RefObject<HTMLDivElement | null>) {
   const pending = useRef(false);
   useEffect(() => {
     const changed = () => setFullscreen(document.fullscreenElement === root.current);
+    changed();
     document.addEventListener('fullscreenchange', changed);
     return () => document.removeEventListener('fullscreenchange', changed);
   }, [root]);
+  useEffect(() => {
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape' && !document.fullscreenElement) setFullscreen(false); };
+    document.addEventListener('keydown', escape);
+    return () => document.removeEventListener('keydown', escape);
+  }, []);
   async function exitFullscreen() {
     if (document.fullscreenElement === root.current) {
       try { await document.exitFullscreen(); } catch { /* Keep the visible exit available. */ }
