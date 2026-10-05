@@ -4,7 +4,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
  const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5181'],{stdio:'ignore'});let browser;
  try {
   for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:5181/');break}catch{await new Promise(r=>setTimeout(r,120))}}
-  browser=await chromium.launch({headless:true,args:packed.args,executablePath:process.env.WORDMD_BROWSER||path.resolve('../qa-browser/chromium')});
+  browser=await chromium.launch({headless:true,args:packed.args,executablePath:(process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER)||path.resolve('../qa-browser/chromium')});
   const context=await browser.newContext({viewport:{width:1440,height:980}}),page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));await page.addInitScript(() => { window.showSaveFilePicker = undefined; if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({lang: 'es'})); });await page.goto('http://127.0.0.1:5181/');await page.getByRole('link',{name:/^(Welcome document|Documento de Bienvenida)$/}).click();await page.locator('.ProseMirror').waitFor();
   const records=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const req=indexedDB.open('wordmd',1);req.onupgradeneeded=()=>req.result.createObjectStore('drafts',{keyPath:'id'});req.onerror=()=>reject(req.error);req.onsuccess=()=>{const db=req.result,tx=db.transaction('drafts','readonly'),r=tx.objectStore('drafts').getAll();r.onsuccess=()=>resolve(r.result);tx.oncomplete=()=>db.close()}}));

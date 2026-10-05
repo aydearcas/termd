@@ -2,84 +2,73 @@
 
 English · [Español](README.es.md)
 
-A Markdown editor with visual editing, a code view, and document comments. Version 1.5.2.
+**Review Markdown like you review in Word.** Termd is a Markdown editor with a word-processor interface, a code view, and comment threads in the margin — and it exports those comments as real Word comments.
 
-## Version 1.5.2
+**[Open Termd →](https://aydearcas.github.io/termd/)** · [Download the offline version (Termd.html)](https://aydearcas.github.io/termd/Termd.html) · [Changelog](CHANGELOG.md)
 
-- Quick access Save, Undo and Redo before the document tabs.
-- Save writes to the opened or dropped file when the browser supports direct file access; new documents choose a destination on first save.
-- Fullscreen keeps the whole Termd interface visible.
-- File → Export separates Print, Export PDF and Export DOCX. Word exports can include comments, replies and resolved states.
-- Pasted screenshots insert actual image data and persist when saved: embedded in Markdown or stored as a resource inside .trmd.
-- Support Termd uses the logo blue with white text and heart, plus a hover transition.
+![Selecting a passage, adding a comment and switching to split view](docs/img/termd-demo.gif)
 
-## Version 1.5.1
+## Why Termd
 
-- In Visual, new comments open beside the selected passage without moving the document when opening, publishing or saving them.
-- New document format options share the same neutral appearance and highlight on hover, with visible keyboard navigation.
+- **Comments that travel.** Select a passage, comment, reply and resolve. Comments live in `.trmd` files and export to `.docx` as native Word comments, so reviewers who only use Word can read them.
+- **Your Markdown stays yours.** Unedited files are saved byte for byte (BOM and line endings included). Constructs the visual editor does not handle — front matter, HTML, Mermaid, references — are protected instead of rewritten.
+- **Visual, code or both.** Edit in a familiar ribbon interface, in Markdown, or in a split view where both panes are editable and synchronized.
+- **Local first.** No account and no document server. Files open from your device; drafts are recovered from your browser.
+
+| Comments in the margin | Exported to Word (shown in LibreOffice) |
+|---|---|
+| ![Comment anchored to a passage](docs/img/termd-comentarios.png) | ![DOCX export with the comment in the margin](docs/img/termd-docx-comentarios.png) |
 
 ## Features
 
-- English by default. Empty startup with Open document, New document, and Continue where you left off. A link below opens the welcome document in the interface language.
-- Configurable bracket auto-closing in Code, independent fullscreen and caret-centered Focus mode, and zoom in both editors.
-
-- Visual and Markdown code editors, with a split view that supports editing in both panes and keeps content synchronized.
-- Multiple documents in tabs, a resizable document outline, and contextual table tools.
-- Standard Markdown (`.md`) and commented Markdown (`.trmd`) files. Adding the first comment converts a Markdown document in memory; choose when to save it.
-- Resize images from corners or sides in Visual and editable Split, with proportional sizing, undo and Reset size. Saved dimensions use HTML image attributes inside Markdown.
-- External images are enabled by default for new preferences; saved choices are respected.
-- Printing through the browser dialog, direct paginated PDF export and editable DOCX export with optional review comments. See [export details](docs/EXPORTACION.md).
-- Local document editing without an account or a document server.
-
-## Using Termd
-
-Open the published web app to edit files from your device. Termd does not send your documents to a Termd server. Recovery drafts are stored locally in your browser and depend on the browser and the address you use to access the app. Save your files to keep an independent copy. If you enable remote content, such as external images, your browser will make those requests.
-
-You can also download this repository and open `Termd.html` to use the standalone version. See [LEEME.md](LEEME.md) for additional local usage instructions and [docs/TRMD.md](docs/TRMD.md) for the commented document format. These guides are currently in Spanish.
+- Visual and Markdown code editors, plus a split view with both panes editable and synchronized.
+- Multiple documents in tabs, a resizable outline, and contextual table tools.
+- Standard Markdown (`.md`) and commented Markdown (`.trmd`). The first comment converts a Markdown document in memory; you choose when to save it.
+- Resizable images; pasted screenshots are kept inside the document.
+- Print, direct paginated PDF export, and editable DOCX export with optional comments. See [export details](docs/EXPORTACION.md).
+- Find and replace, focus mode, fullscreen, zoom, and document statistics.
+- English and Spanish interface.
 
 ### File formats
 
-- **`.md`** is standard Markdown for use with other editors.
-- **`.trmd`** keeps Markdown and comments together in a single Termd document. You can also save a Markdown copy from a `.trmd` document; comments are not included in that copy.
+- **`.md`** is standard Markdown for use with any editor.
+- **`.trmd`** keeps Markdown, comments and local images together in one file. See [docs/TRMD.md](docs/TRMD.md). You can save a plain `.md` copy from a `.trmd` document; comments are not included in that copy.
 
-## Publishing with GitHub Pages
+## Using Termd
 
-Follow [GUIA_PUBLICACION.md](GUIA_PUBLICACION.md), the step-by-step publishing guide in Spanish. The included `.github/workflows/pages.yml` workflow deploys the prebuilt files in `dist` whenever the `main` branch is updated. You do not need to install Node.js for the initial deployment.
+- **Online:** https://aydearcas.github.io/termd/ — works best in Chrome or Edge, which allow saving directly to the opened file. Other browsers download a copy.
+- **Offline:** download [Termd.html](https://aydearcas.github.io/termd/Termd.html) and open it in your browser. It is self-contained and makes no network requests.
 
-The workflow deploys `dist`; it does not compile the source code. After changing files in `src`, rebuild the application and upload the updated `dist` directory as well.
+Termd does not send your documents anywhere. Recovery drafts are stored in your browser and depend on the address you open Termd from. Save your files to keep an independent copy. If you enable external images, your browser loads them from their servers.
+
+More detail (in Spanish) in [LEEME.md](LEEME.md).
 
 ## Development
 
-With a Node.js version compatible with the project's dependencies, run these commands from the repository directory:
+Requires Node.js 22.13 or later.
 
 ```bash
 npm ci
-npm run dev
+npm run dev        # development server
+npm test           # core tests
+npm run build      # build into dist/
+node scripts/package.cjs   # build Termd.html from dist/
+npm run format     # format with Prettier
 ```
 
-To run the core tests and build the application:
+Browser test suites live in `tests/*.cjs` and need a Chromium binary set in `TERMD_BROWSER`. See [docs/VERIFICACION.md](docs/VERIFICACION.md) (Spanish).
 
-```bash
-npm test
-npm run build
-```
+### How publishing works
 
-The build uses relative asset paths, so the app can be hosted under a subdirectory such as `/termd/`. To regenerate the standalone HTML file after building:
+- Pushing to `develop` (or opening a pull request to `main`) runs **Comprobar Termd**: install, tests, build, and a downloadable build artifact to try before merging.
+- Merging into `main` runs **Publicar Termd**: it builds `dist/` from scratch, generates `Termd.html`, and deploys to GitHub Pages. If tests or the build fail, nothing is deployed and the previous version stays online.
 
-```bash
-node scripts/package.cjs
-```
-
-Then upload the updated source files, `dist`, and, if regenerated, `Termd.html`. Browser test scripts are available in `tests`. See [docs/VERIFICACION.md](docs/VERIFICACION.md) for this release's verification report in Spanish.
+`dist/` and `Termd.html` are build outputs and are not stored in the repository. Step-by-step update guide (Spanish): [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md).
 
 ## License
 
-Termd uses the custom **Termd Source-Available License 1.0**. It permits free use, including internal use by businesses, and free redistribution with corresponding source code under the same terms. Selling or directly monetizing Termd or derived versions requires separate written permission. Unconditional voluntary contributions to the original Termd project are permitted. Documents created with Termd are not covered by this software license.
-
-This is source-available software with commercial restrictions, rather than OSI-approved open-source software. See [LICENSE](LICENSE), the Spanish explanation in [docs/LICENCIA.md](docs/LICENCIA.md), and [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Third-party components retain their own licenses.
+[MIT](LICENSE) © 2026 Aythami de Armas Castellano. Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Documents you create with Termd are yours.
 
 ## Support Termd
 
-Termd is free to use. If you find it useful, you can [support its development through PayPal](https://paypal.me/aydearcas). Contributions are voluntary and do not unlock additional features. The **Support Termd** link is available in the app's top bar and opens PayPal in a new tab. See [APOYAR_TERMD.md](APOYAR_TERMD.md) for publishing instructions in Spanish.
-
-For updates to an existing repository, see [ACTUALIZAR_GITHUB.md](ACTUALIZAR_GITHUB.md), the Spanish update guide.
+Termd is free. If you find it useful, you can [support its development through PayPal](https://paypal.me/aydearcas). Contributions are voluntary and do not unlock features.

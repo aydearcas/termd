@@ -1,4 +1,4 @@
-# Perfil Markdown de Termd 1.5.2
+# Perfil Markdown de Termd 1.5.3
 
 | Construcción | Visual | Lectura | Conservación al abrir y cambiar de vista |
 |---|---|---|---|

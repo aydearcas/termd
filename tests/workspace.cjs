@@ -4,7 +4,7 @@ const fs = require('node:fs/promises'), path = require('node:path'), assert = re
  const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5180'],{stdio:'ignore'});let browser;
  try {
   for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:5180/');break}catch{await new Promise(r=>setTimeout(r,120))}}
-  browser=await chromium.launch({headless:true,args:packed.args,executablePath:process.env.WORDMD_BROWSER||path.resolve('../qa-browser/chromium')});
+  browser=await chromium.launch({headless:true,args:packed.args,executablePath:(process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER)||path.resolve('../qa-browser/chromium')});
   const context=await browser.newContext({viewport:{width:1500,height:1000}}), page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());await page.addInitScript(() => { window.showSaveFilePicker = undefined; if (!localStorage.getItem('wordmd.settings')) localStorage.setItem('wordmd.settings', JSON.stringify({lang: 'es'})); });await page.goto('http://127.0.0.1:5180/');await page.getByRole('link',{name:/^(Welcome document|Documento de Bienvenida)$/}).click();
   const app=()=>page.locator('.app[data-active-document="true"]'), tab=name=>page.getByRole('tab',{name,exact:true});

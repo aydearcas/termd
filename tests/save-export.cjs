@@ -5,7 +5,7 @@ const { spawn } = require('node:child_process'), assert = require('node:assert/s
  const ok = message => { passed++; console.log('PASS ' + message); };
  try {
   for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:5193');break}catch{await new Promise(r=>setTimeout(r,120))}}
-  browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'],executablePath:process.env.WORDMD_BROWSER||await packed.executablePath()});
+  browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'],executablePath:(process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER)||await packed.executablePath()});
   const page=await browser.newPage({viewport:{width:1500,height:1000}}), errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(() => {
    window.__saveCalls=0;window.__openName='original.md';window.__saveName='copy.md';window.__permission='granted';window.__permissionCalls=0;window.__printCalls=0;window.print=()=>window.__printCalls++;

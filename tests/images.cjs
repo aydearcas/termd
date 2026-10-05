@@ -7,7 +7,7 @@ const fs = require('node:fs/promises'), assert = require('node:assert/strict'), 
   try {
     for (let i = 0; i < 50; i++) { try { await fetch('http://127.0.0.1:5191'); break; } catch { await new Promise(r => setTimeout(r, 120)); } }
     const bytes = await fs.readFile('tests/assets/resize.png');
-    browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || await packed.executablePath() });
+    browser = await chromium.launch({ headless: true, args: packed.args, executablePath: (process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER) || await packed.executablePath() });
     const context = await browser.newContext({ viewport: { width: 1500, height: 1000 } });
     await context.route('https://images.example.test/**', route => route.fulfill({ contentType: 'image/png', body: bytes }));
     const page = await context.newPage(), errors = [];

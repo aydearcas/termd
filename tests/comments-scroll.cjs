@@ -5,7 +5,7 @@ const assert = require('node:assert/strict'), { spawn } = require('node:child_pr
   let browser, passed = 0; const ok = message => { passed++; console.log('PASS ' + message); };
   try {
     for (let i = 0; i < 50; i++) { try { await fetch('http://127.0.0.1:5192'); break; } catch { await new Promise(r => setTimeout(r, 120)); } }
-    browser = await chromium.launch({ headless: true, args: packed.args, executablePath: process.env.WORDMD_BROWSER || await packed.executablePath() });
+    browser = await chromium.launch({ headless: true, args: packed.args, executablePath: (process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER) || await packed.executablePath() });
     const page = await browser.newPage({ viewport: { width: 1500, height: 1000 } }), errors = [];
     page.on('pageerror', e => errors.push(e.message));
     await page.addInitScript(() => { window.showSaveFilePicker = undefined; window.showOpenFilePicker = undefined; });

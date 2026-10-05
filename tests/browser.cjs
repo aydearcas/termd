@@ -10,7 +10,7 @@ const { spawn } = require('node:child_process');
  let browser;
  try {
   for(let i=0;i<50;i++){try{await fetch('http://127.0.0.1:5178/');break}catch{await new Promise(r=>setTimeout(r,120))}}
-  const executablePath=process.env.WORDMD_BROWSER || path.resolve('../qa-browser/chromium');
+  const executablePath=(process.env.TERMD_BROWSER||process.env.WORDMD_BROWSER) || path.resolve('../qa-browser/chromium');
   browser=await chromium.launch({headless:true,args:packed.args,executablePath});
   const context=await browser.newContext({viewport:{width:1440,height:980},permissions:['clipboard-read','clipboard-write']});
   const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));const nativeLocator=page.locator.bind(page);page.locator=(selector,...args)=>nativeLocator('.app[data-active-document="true"] '+selector,...args);page.on('dialog',d=>d.accept());

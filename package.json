@@ -1,18 +1,25 @@
 {
   "name": "termd",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Local Markdown word processor",
+  "author": "Aythami de Armas Castellano",
+  "license": "MIT",
+  "homepage": "https://aydearcas.github.io/termd/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aydearcas/termd.git"
+  },
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build --base ./",
     "test": "node --experimental-strip-types --test tests/core.test.ts",
-    "start": "node launch.cjs"
+    "start": "node launch.cjs",
+    "format": "npx prettier@3 --write \"src/**/*.{ts,tsx,css}\" tests/core.test.ts",
+    "format:check": "npx prettier@3 --check \"src/**/*.{ts,tsx,css}\" tests/core.test.ts"
   },
   "keywords": [],
-  "author": "",
-  "license": "SEE LICENSE IN LICENSE",
-  "type": "module",
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.11.1",

@@ -1,3 +1,25 @@
+# Verificación de Termd 1.5.3 — 5 de octubre de 2026
+
+Versión de mantenimiento centrada en la publicación, la legibilidad del código y la documentación. No cambia los formatos `.md`/`.trmd` ni el comportamiento de edición, salvo el estado inicial del panel de comentarios en pantallas estrechas.
+
+## Comprobado al preparar la versión
+
+- **Formateo sin cambios de comportamiento.** Se aplicó Prettier a todo `src` y a `tests/core.test.ts`. Cada archivo se transpiló y minificó con esbuild antes y después: el resultado es idéntico salvo diferencias sin efecto (espacios dentro de `calc()` y de valores de propiedades CSS personalizadas, y un texto JSX `" · "` que pasa a dividirse en dos nodos contiguos con el mismo contenido visible).
+- **Extracción de componentes.** `Button`, `Group` y `dateLabel` (`ui.tsx`), `fresh` (`document-state.ts`) y seis diálogos (`DocumentDialogs.tsx`) se movieron sin cambiar su contenido. Una comprobación de tipos con TypeScript y declaraciones mínimas de las dependencias no muestra nombres sin resolver ni errores nuevos respecto a 1.5.2; solo desaparecen importaciones sin uso.
+- **Capturas** del README tomadas sobre la web compilada de 1.5.2, cuya interfaz no cambia en esta versión. La exportación DOCX se abrió en LibreOffice con el comentario en el margen.
+- **Flujos de GitHub Actions** revisados como YAML válido.
+
+## Comprobado por GitHub Actions en cada publicación
+
+El entorno donde se preparó esta versión no podía descargar paquetes de npm, así que la instalación de dependencias, `tsc --noEmit`, la compilación con Vite, las pruebas del núcleo y la generación de `Termd.html` se ejecutan en GitHub Actions:
+
+- **Comprobar Termd** (`develop` y pull requests): pruebas del núcleo, compilación, empaquetado y copia descargable `termd-compilado`. Las suites de navegador se ejecutan como comprobación informativa con el Chromium de `@sparticuz/chromium`. Se excluyen `save-export.cjs` (requiere Chromium 143 por el fallo de OPFS descrito abajo) y `split-benchmark.cjs` (medición de rendimiento).
+- **Publicar Termd** (`main`): repite pruebas y compilación desde cero y solo publica si todo termina bien.
+
+Antes de fusionar en `main`, comprueba la marca verde de **Compilar y probar** y prueba `Termd.html` desde el artefacto `termd-compilado`. `tests/distribution.cjs` espera ahora *Termd 1.5.3* en Ayuda.
+
+## Registro de versiones anteriores
+
 # Verificación de Termd 1.5.2 — 5 de octubre de 2026
 
 Esta versión pasó **216 comprobaciones automatizadas**: 20 del núcleo, 21 del flujo de edición, 25 de formatos y guardado, 19 de pestañas, 11 de pantalla vacía, 24 de interfaz y comentarios, 15 de imágenes, 9 de posición de comentarios, 15 de vista dividida, 21 nuevas de guardado/exportación, 10 nuevas de capturas pegadas, 17 de distribución compilada/independiente y 9 de recursos y servidor local. TypeScript y Vite compilaron correctamente; se regeneró `Termd.html` con los motores de exportación incorporados.

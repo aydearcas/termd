@@ -1,36 +1,26 @@
 # Licencia de Termd
 
-Termd utiliza una licencia propia: **Termd Source-Available License 1.0**. El texto de referencia en inglés está en `LICENSE`; este documento lo explica en español sin sustituirlo.
+Desde la versión 1.5.3, Termd se distribuye con la **licencia MIT**. El texto legal, en inglés, está en [`LICENSE`](../LICENSE). Este documento es un resumen informativo y no sustituye a ese texto.
 
-## Permitido
+## Qué permite
 
-- Usar Termd gratis, con fines personales, académicos, públicos o profesionales.
-- Usarlo dentro de una empresa, incluso para elaborar trabajos que después se vendan.
-- Estudiar y modificar el programa.
-- Compartirlo gratis, conservando la licencia, atribuciones y avisos de terceros.
-- Redistribuir versiones modificadas gratis, con su código fuente y las mismas condiciones.
-- Alojar una versión gratuita y proporcionar su código fuente correspondiente a los usuarios.
-- Aportar voluntariamente al proyecto original, sin recibir acceso o funciones exclusivas a cambio.
+- Usar Termd gratis, a título personal o dentro de cualquier organización.
+- Estudiar, copiar y modificar el código.
+- Redistribuir Termd, con o sin cambios, gratis o de pago, e incluirlo en otros proyectos, también comerciales o cerrados.
 
-## Requiere autorización escrita adicional
+## Qué exige
 
-- Vender, alquilar o cobrar por distribuir Termd o una versión derivada.
-- Ofrecerlo como editor de pago, función de pago, parte de un paquete de pago o servicio alojado de pago.
-- Monetizar una distribución mediante anuncios o patrocinios de pago.
-- Condicionar su descarga o uso a pagos, suscripciones o aportaciones.
+- Conservar el aviso de copyright y el texto de la licencia MIT en las copias o partes sustanciales del programa.
 
-## Código y documentos
+## Qué no ofrece
 
-La redistribución de versiones compiladas y las versiones alojadas para terceros deben facilitar el código modificable de esa versión, con sus cambios e instrucciones de compilación. Las modificaciones privadas de uso exclusivamente interno no requieren publicación.
+- Ninguna garantía. El programa se entrega «tal cual».
 
-Los documentos, comentarios e imágenes de los usuarios quedan fuera de la licencia del programa. Por ejemplo, una empresa puede utilizar Termd para redactar un informe que después venda.
+## Otras precisiones
 
-Las dependencias mantienen sus licencias originales; consulta `THIRD_PARTY_NOTICES.txt`. Esta licencia no permite retirar sus avisos ni modificar sus derechos.
+- **Tus documentos no están afectados.** Los archivos `.md` y `.trmd` que creas con Termd son tuyos; la licencia solo se aplica al programa.
+- **Dependencias.** Las bibliotecas de terceros incluidas en Termd mantienen sus propias licencias, recogidas en [`THIRD_PARTY_NOTICES.txt`](../THIRD_PARTY_NOTICES.txt).
+- **Versiones anteriores.** Las versiones hasta la 1.5.2 se publicaron con la licencia propia *Termd Source-Available License 1.0*. Quien obtuvo una copia entonces la conserva con esas condiciones; las versiones nuevas usan MIT.
+- **Aportaciones voluntarias.** El enlace **Apoyar Termd** sigue siendo opcional y no desbloquea funciones.
 
-## Alcance
-
-Al restringir la explotación comercial, Termd es software de **código disponible** (source-available), no open source según la definición de la OSI. La licencia es propia y no cuenta con la revisión jurídica o el reconocimiento de una licencia estándar; es conveniente revisarla jurídicamente antes de basar en ella una reclamación.
-
-El cambio no revoca permisos concedidos a copias legítimamente obtenidas anteriormente bajo MIT u otra licencia. Si ya se publicó una versión con MIT, los derechos concedidos para esa versión no desaparecen por cambiar este archivo.
-
-Referencia sobre la definición de open source: https://opensource.org/osd
+Termd es ahora software **open source** según la definición de la OSI.
